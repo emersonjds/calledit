@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build
+dist/
+dev-dist/
+*.tsbuildinfo
+node_modules/.tmp/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+
+# test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# AI tooling — never commit local/session state
+.claude/settings.local.json
+.serena/
+.superpowers/
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
