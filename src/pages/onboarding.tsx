@@ -1,14 +1,30 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Wallet } from 'lucide-react';
+import { Check, Mail, Wallet } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { CreateWalletSheet } from '@/widgets/create-wallet-sheet';
 import { useConnectWallet } from '@/features/wallet';
+import {
+  createEmbeddedWallet,
+  loadEmbeddedWallet,
+  saveEmbeddedWallet,
+} from '@/shared/lib/solana-keypair';
 
 export function OnboardingPage() {
   const navigate = useNavigate();
   const connect = useConnectWallet();
+  const [createOpen, setCreateOpen] = useState(false);
 
-  const enter = (provider: string) =>
-    connect.mutate({ provider }, { onSuccess: () => navigate('/', { replace: true }) });
+  const goHome = () => navigate('/', { replace: true });
+
+  const enter = (provider: string) => connect.mutate({ provider }, { onSuccess: goHome });
+
+  // Google here is a simulated OAuth backed by the same embedded wallet (real SDK swap is the deferred step).
+  const enterWithGoogle = async () => {
+    const wallet = loadEmbeddedWallet() ?? (await createEmbeddedWallet());
+    saveEmbeddedWallet(wallet);
+    connect.mutate({ provider: 'google', address: wallet.address }, { onSuccess: goHome });
+  };
 
   return (
     <div className="bg-background flex min-h-dvh w-full max-w-[430px] flex-col items-center justify-between px-6 py-14 text-center">
@@ -33,17 +49,43 @@ export function OnboardingPage() {
         <Button
           size="lg"
           disabled={connect.isPending}
+          onClick={enterWithGoogle}
+          className="bg-foreground text-background hover:bg-foreground/90 h-14 w-full text-base font-bold"
+        >
+          <Mail className="size-5" /> Continue with Google
+        </Button>
+        <Button
+          size="lg"
+          disabled={connect.isPending}
           onClick={() => enter('phantom')}
           className="bg-lime text-background hover:bg-lime/90 h-14 w-full text-base font-bold"
         >
           <Wallet className="size-5" /> Connect Phantom
         </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            variant="outline"
+            disabled={connect.isPending}
+            onClick={() => enter('metamask')}
+            className="border-border h-12"
+          >
+            MetaMask
+          </Button>
+          <Button
+            variant="outline"
+            disabled={connect.isPending}
+            onClick={() => setCreateOpen(true)}
+            className="border-border h-12"
+          >
+            Create wallet
+          </Button>
+        </div>
         <Button
           size="lg"
-          variant="outline"
+          variant="ghost"
           disabled={connect.isPending}
           onClick={() => enter('guest')}
-          className="border-border text-muted-foreground h-12 w-full"
+          className="text-muted-foreground h-12 w-full"
         >
           Play as guest
         </Button>
@@ -51,6 +93,8 @@ export function OnboardingPage() {
           🔒 Secured by Solana · By connecting you agree to the Terms and confirm you are over 18.
         </p>
       </div>
+
+      <CreateWalletSheet open={createOpen} onOpenChange={setCreateOpen} onConnected={goHome} />
     </div>
   );
 }
