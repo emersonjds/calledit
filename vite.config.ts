@@ -10,6 +10,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
+      // Do not register a workbox SW: MSW owns the service worker in this demo
+      // (two SWs at the same scope would fight and break the mocked /api backend).
+      injectRegister: false,
       includeAssets: ["favicon.svg"],
       manifest: {
         name: "Called It",
@@ -28,5 +31,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
+  },
+  build: {
+    outDir: "out", // drag-and-drop this folder onto Netlify
+    chunkSizeWarningLimit: 1500,
   },
 });
