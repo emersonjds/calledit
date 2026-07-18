@@ -69,7 +69,7 @@ For each new feature, deliver:
 1. **Textual flow diagram** (input → trust → authorization → funds/settlement → output).
 2. **Explicit trust boundaries** (client / wallet / RPC / feed / program).
 3. **STRIDE threat list** ranked by (likelihood × impact).
-4. **Specific, implementable mitigations** (not "use HTTPS" — say *which signer check*, *which constraint*, *which cookie flag*).
+4. **Specific, implementable mitigations** (not "use HTTPS" — say _which signer check_, _which constraint_, _which cookie flag_).
 5. **Validation tests** (including abuse cases) the team can add to the suite.
 
 ## Called It — special attention

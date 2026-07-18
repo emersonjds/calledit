@@ -13,7 +13,7 @@ TxLINE is **two systems glued by cryptography**:
 1. **Off-chain REST/SSE API** (`{host}/api/...`) — serves fixtures, odds, scores, and Merkle proofs.
    Gated by two credentials (a guest JWT + an activated API token).
 2. **On-chain Solana program** (`txoracle`) — publishes the Merkle **batch root**, holds the
-   subscription state, and exposes a `validate_stat` instruction family that lets *anyone* prove,
+   subscription state, and exposes a `validate_stat` instruction family that lets _anyone_ prove,
    on-chain, that a statistic held — using the proof the REST API returns.
 
 The provable surface is **8 numbers only** (goals / yellow / red / corners, per team, per period).
@@ -27,13 +27,13 @@ has no Merkle proof and can never settle on-chain.
 Every step (RPC, program ID, TxL mint, guest-JWT host, activation host) must be on the **same
 network**, or you get an unexplained **403**. This is trap #5.
 
-| | Mainnet | Devnet |
-| --- | --- | --- |
-| Program ID | `9ExbZjAapQww1vfcisDmrngPinHTEfpjYRWMunJgcKaA` | `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J` |
-| TxL mint | `Zhw9TVKp68a1QrftncMSd6ELXKDtpVMNuMGr1jNwdeL` | `4Zao8ocPhmMgq7PdsYWyxvqySMGx7xb9cMftPMkEokRG` |
-| API host | `https://txline.txodds.com` | `https://txline-dev.txodds.com` |
-| Solana RPC | `https://api.mainnet-beta.solana.com` | `https://api.devnet.solana.com` |
-| Free service levels | `1` (60s delay) · **`12` (real-time)** | `1` (samplingIntervalSec=0, per on-chain pricing matrix) |
+|                     | Mainnet                                        | Devnet                                                   |
+| ------------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| Program ID          | `9ExbZjAapQww1vfcisDmrngPinHTEfpjYRWMunJgcKaA` | `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J`           |
+| TxL mint            | `Zhw9TVKp68a1QrftncMSd6ELXKDtpVMNuMGr1jNwdeL`  | `4Zao8ocPhmMgq7PdsYWyxvqySMGx7xb9cMftPMkEokRG`           |
+| API host            | `https://txline.txodds.com`                    | `https://txline-dev.txodds.com`                          |
+| Solana RPC          | `https://api.mainnet-beta.solana.com`          | `https://api.devnet.solana.com`                          |
+| Free service levels | `1` (60s delay) · **`12` (real-time)**         | `1` (samplingIntervalSec=0, per on-chain pricing matrix) |
 
 **Real-time World Cup data only exists on mainnet SL 12.** Devnet is for proving the on-chain path
 cheaply (airdroppable SOL); mainnet SL 12 is for the live demo feed. Load the **matching**
@@ -61,27 +61,43 @@ every data request sends BOTH:  Authorization: Bearer ${jwt}   +   X-Api-Token: 
 ```
 
 ### 2.1 Guest JWT
+
 `POST {host}/auth/guest/start` → `TokenResponse { token }`. Read it as `response.data.token`.
 Sent as `Authorization: Bearer <jwt>` **and** embedded in the activation signature preimage.
 
 ### 2.2 Subscribe on-chain (`txoracle` Anchor program)
+
 Free World Cup tiers require **no TxL**, but the subscribe tx still needs **SOL** for fees + rent
 (on devnet, airdrop first). Derive shared PDAs once:
 
 ```ts
 const [tokenTreasuryPda] = PublicKey.findProgramAddressSync(
-  [Buffer.from("token_treasury_v2")], program.programId);
+  [Buffer.from('token_treasury_v2')],
+  program.programId,
+);
 const [pricingMatrixPda] = PublicKey.findProgramAddressSync(
-  [Buffer.from("pricing_matrix")], program.programId);
+  [Buffer.from('pricing_matrix')],
+  program.programId,
+);
 
 const tokenTreasuryVault = getAssociatedTokenAddressSync(
-  txlTokenMint, tokenTreasuryPda, true, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID);
+  txlTokenMint,
+  tokenTreasuryPda,
+  true,
+  TOKEN_2022_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+);
 const userTokenAccount = getAssociatedTokenAddressSync(
-  txlTokenMint, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID);
+  txlTokenMint,
+  wallet.publicKey,
+  false,
+  TOKEN_2022_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+);
 
-const SERVICE_LEVEL_ID = 12;      // mainnet real-time; SL 1 is 60s late
-const DURATION_WEEKS = 4;         // multiples of 4, up to 12 months, free to renew
-const SELECTED_LEAGUES: number[] = [];  // [] = standard World Cup bundle
+const SERVICE_LEVEL_ID = 12; // mainnet real-time; SL 1 is 60s late
+const DURATION_WEEKS = 4; // multiples of 4, up to 12 months, free to renew
+const SELECTED_LEAGUES: number[] = []; // [] = standard World Cup bundle
 
 const txSig = await program.methods
   .subscribe(SERVICE_LEVEL_ID, DURATION_WEEKS)
@@ -103,29 +119,34 @@ const txSig = await program.methods
 > `TOKEN_2022_PROGRAM_ID` for every ATA derivation and for the `tokenProgram` account.
 
 ### 2.3 Activate the API token
+
 Sign the **exact** message string with the **same wallet** that submitted the subscribe tx:
 
 ```ts
-const messageString = `${txSig}:${SELECTED_LEAGUES.join(",")}:${jwt}`;
+const messageString = `${txSig}:${SELECTED_LEAGUES.join(',')}:${jwt}`;
 // SELECTED_LEAGUES = []  →  `${txSig}::${jwt}`  (two colons)
 const signatureBytes = await wallet.signMessage(new TextEncoder().encode(messageString));
-const walletSignature = Buffer.from(signatureBytes).toString("base64");  // base64 detached
+const walletSignature = Buffer.from(signatureBytes).toString('base64'); // base64 detached
 
-const { data } = await axios.post(`${host}/api/token/activate`,
+const { data } = await axios.post(
+  `${host}/api/token/activate`,
   { txSig, walletSignature, leagues: SELECTED_LEAGUES },
-  { headers: { Authorization: `Bearer ${jwt}` } });
+  { headers: { Authorization: `Bearer ${jwt}` } },
+);
 const apiToken = data.token || data;
 ```
 
 `ActivationPayload` required fields: `txSig`, `walletSignature` (+ optional `leagues: int32[]`).
 
 ### 2.4 Refresh rules
+
 - **401** on a data request → guest JWT expired. Renew via `/auth/guest/start` on the **same host**;
   retry with the **same** API token.
 - **403** on activation or data → check message string, signing wallet, base64 encoding, tx network,
   and activation host all match one network.
 
 ### 2.5 Optional: buy TxL (paid tiers only — not needed for World Cup)
+
 `POST /api/guest/purchase/quote { buyerPubkey, txlineAmount }` (Bearer JWT) →
 `PurchaseQuoteResponse { transactionBase64, baseUsdtCost, feeUsdtAmount, totalUsdtCharged }`.
 Deserialize, sign locally, broadcast. Requires USDT; TxODDS may require KYC. **Skip for Called It.**
@@ -139,24 +160,26 @@ All under `{host}/api`, all require **both** headers (`Authorization: Bearer <jw
 `Date.now()` (trap #4).
 
 ### Fixtures
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/fixtures/snapshot` | Latest fixture metadata (optionally from/within a window) |
-| GET | `/fixtures/updates/{epochDay}/{hourOfDay}` | Fixture updates for a day/hour |
-| GET | `/fixtures/validation` | Merkle proof for one fixture update |
-| GET | `/fixtures/batch-validation` | Merkle proof for a full hourly fixture batch |
+
+| Method | Path                                       | Purpose                                                   |
+| ------ | ------------------------------------------ | --------------------------------------------------------- |
+| GET    | `/fixtures/snapshot`                       | Latest fixture metadata (optionally from/within a window) |
+| GET    | `/fixtures/updates/{epochDay}/{hourOfDay}` | Fixture updates for a day/hour                            |
+| GET    | `/fixtures/validation`                     | Merkle proof for one fixture update                       |
+| GET    | `/fixtures/batch-validation`               | Merkle proof for a full hourly fixture batch              |
 
 `Fixture` fields include `FixtureId (int64)`, `StartTime/Ts (int64)`, `Competition(Id)`,
 `Participant1/2(Id)`, `Participant1IsHome`.
 
 ### Odds (StablePrice)
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/odds/snapshot/{fixtureId}` | Latest odds per unique market line |
-| GET | `/odds/updates/{fixtureId}` | Live odds updates for a fixture |
-| GET | `/odds/updates/{epochDay}/{hourOfDay}/{interval}` | Historical 5-min bucket |
-| GET | `/odds/stream` | **SSE** real-time odds stream |
-| GET | `/odds/validation` | Merkle proof for one odds update |
+
+| Method | Path                                              | Purpose                            |
+| ------ | ------------------------------------------------- | ---------------------------------- |
+| GET    | `/odds/snapshot/{fixtureId}`                      | Latest odds per unique market line |
+| GET    | `/odds/updates/{fixtureId}`                       | Live odds updates for a fixture    |
+| GET    | `/odds/updates/{epochDay}/{hourOfDay}/{interval}` | Historical 5-min bucket            |
+| GET    | `/odds/stream`                                    | **SSE** real-time odds stream      |
+| GET    | `/odds/validation`                                | Merkle proof for one odds update   |
 
 `OddsPayload` carries a **clean `Pct` array** (win-probability with the house margin already removed) —
 this powers the app's live win-probability meter. Also `PriceNames[]`, `Prices[]`, `MarketPeriod`,
@@ -164,15 +187,16 @@ this powers the app's live win-probability meter. Also `PriceNames[]`, `Prices[]
 payload at runtime** (trap #3).
 
 ### Scores
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/scores/snapshot/{fixtureId}` | Latest score events for a fixture |
-| GET | `/scores/updates/{fixtureId}` | Score updates in the current window |
-| GET | `/scores/updates/{epochDay}/{hourOfDay}/{interval}` | Historical 5-min bucket |
-| GET | `/scores/historical/{fixtureId}` | Full stored sequence (limited window) |
-| GET | `/scores/stream` | **SSE** live match feed |
-| GET | `/scores/stat-validation` | Merkle proof (v1) |
-| GET | `/scores/stat-validation-v3` | **Merkle multiproof — the settlement endpoint** |
+
+| Method | Path                                                | Purpose                                         |
+| ------ | --------------------------------------------------- | ----------------------------------------------- |
+| GET    | `/scores/snapshot/{fixtureId}`                      | Latest score events for a fixture               |
+| GET    | `/scores/updates/{fixtureId}`                       | Score updates in the current window             |
+| GET    | `/scores/updates/{epochDay}/{hourOfDay}/{interval}` | Historical 5-min bucket                         |
+| GET    | `/scores/historical/{fixtureId}`                    | Full stored sequence (limited window)           |
+| GET    | `/scores/stream`                                    | **SSE** live match feed                         |
+| GET    | `/scores/stat-validation`                           | Merkle proof (v1)                               |
+| GET    | `/scores/stat-validation-v3`                        | **Merkle multiproof — the settlement endpoint** |
 
 > **Trap #2 — history is short** (roughly ~2 weeks, and not the most recent hours). Never rely on
 > `/scores/historical` for anything you'll need later. **Record the SSE stream to disk from day one.**
@@ -187,23 +211,24 @@ A `Scores` event is large. The fields Called It uses: `fixtureId`, `seq (int32)`
 ## 4. Settlement — the crux
 
 ### 4.1 The 8 provable keys × periods
+
 Only these settle on-chain. Base key + period prefix = the stat leaf key.
 
 | Base key | Stat (team 1 / team 2) |
-| --- | --- |
-| 1 / 2 | Goals |
-| 3 / 4 | Yellow cards |
-| 5 / 6 | Red cards |
-| 7 / 8 | Corners |
+| -------- | ---------------------- |
+| 1 / 2    | Goals                  |
+| 3 / 4    | Yellow cards           |
+| 5 / 6    | Red cards              |
+| 7 / 8    | Corners                |
 
-| Prefix | Period |
-| --- | --- |
-| `0` | Total (full match) |
-| `1000` | 1st half |
-| `3000` | 2nd half |
+| Prefix          | Period                 |
+| --------------- | ---------------------- |
+| `0`             | Total (full match)     |
+| `1000`          | 1st half               |
+| `3000`          | 2nd half               |
 | `4000` / `5000` | Extra time (ET1 / ET2) |
-| `6000` | Penalty shootout |
-| `7000` | Extra-time total |
+| `6000`          | Penalty shootout       |
+| `7000`          | Extra-time total       |
 
 Settlement key = `prefix + baseKey` (e.g. a 1st-half team-1 goal is `1001`). This mapping is already
 encoded in `src/entities/match/periods.ts` and `src/entities/prediction/markets.ts`. Anything using
@@ -211,13 +236,14 @@ minute/author/possession is **not provable** — the `foul` market is `provable:
 to settlement.
 
 ### 4.2 Get the proof: `GET /api/scores/stat-validation-v3`
+
 Query params (both auth headers required):
 
-| Param | Type | Notes |
-| --- | --- | --- |
-| `fixtureId` | int32 | the fixture |
-| `seq` | int32 | sequence number of the specific score event within the fixture's history — **from the feed/proof, starts at 1, never `Date.now()`** |
-| `statKeys` | string | comma-separated **1 to 5** stat keys |
+| Param       | Type   | Notes                                                                                                                               |
+| ----------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `fixtureId` | int32  | the fixture                                                                                                                         |
+| `seq`       | int32  | sequence number of the specific score event within the fixture's history — **from the feed/proof, starts at 1, never `Date.now()`** |
+| `statKeys`  | string | comma-separated **1 to 5** stat keys                                                                                                |
 
 Returns **`ScoresStatValidationV3`** — a three-level Merkle bundle:
 
@@ -241,10 +267,11 @@ ProofNode  { hash: binary, isRightSibling: bool }   // List_ProofNode = { items:
 authoritative multiproof endpoint** — prefer it (up to 5 keys in one proof).
 
 ### 4.3 Execute on-chain: `txoracle` `validate_stat` instruction
+
 With the returned proof, submit a Solana transaction into the `txoracle` program's `validate_stat`
 instruction family (the ideas doc references `validate_stat_v2`) to prove a **strategy** holds against
-the extracted stats — e.g. *team-1 goals ≥ threshold*, or a *binary/difference condition between two
-stats*. The instruction re-hashes the leaves with the multiproof up to the on-chain batch root and
+the extracted stats — e.g. _team-1 goals ≥ threshold_, or a _binary/difference condition between two
+stats_. The instruction re-hashes the leaves with the multiproof up to the on-chain batch root and
 returns a boolean.
 
 > **The exact instruction name, args, and account list must be read from the network's
@@ -270,15 +297,16 @@ returns a boolean.
 ```
 @coral-xyz/anchor  @solana/web3.js  @solana/spl-token (TOKEN_2022)  tweetnacl  axios
 ```
+
 SSE examples require **Node 20+**. IDL/types (`txoracle.json`, `Txoracle`) must match the chosen network.
 
 ---
 
 ## 7. HTTP error map
 
-| Status | Meaning | Action |
-| --- | --- | --- |
-| 400 | Bad param (Authorization / X-Api-Token / fixtureId / seq / statKeys) | Fix the request |
-| 401 | Invalid/expired guest JWT | Renew JWT on same host, retry with same API token |
-| 403 | Invalid API token or network mismatch | Check message/wallet/signature/network/host |
-| 500 | Server error | Retry with backoff |
+| Status | Meaning                                                              | Action                                            |
+| ------ | -------------------------------------------------------------------- | ------------------------------------------------- |
+| 400    | Bad param (Authorization / X-Api-Token / fixtureId / seq / statKeys) | Fix the request                                   |
+| 401    | Invalid/expired guest JWT                                            | Renew JWT on same host, retry with same API token |
+| 403    | Invalid API token or network mismatch                                | Check message/wallet/signature/network/host       |
+| 500    | Server error                                                         | Retry with backoff                                |

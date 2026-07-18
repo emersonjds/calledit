@@ -1,7 +1,7 @@
-import type { MatchEvent } from "@/entities/match";
-import type { MarketId } from "./markets";
+import type { MatchEvent } from '@/entities/match';
+import type { MarketId } from './markets';
 
-export type PredictionStatus = "resolving" | "won" | "lost";
+export type PredictionStatus = 'resolving' | 'won' | 'lost';
 
 /** On-chain commitment proving *when* the call was made. */
 export interface OnChainStamp {

@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { Wallet, Zap } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-import { Skeleton } from "@/shared/ui/skeleton";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Wallet, Zap } from 'lucide-react';
+import { Button } from '@/shared/ui/button';
+import { Skeleton } from '@/shared/ui/skeleton';
 import {
   EventTicker,
   MatchHeader,
@@ -11,13 +11,13 @@ import {
   PredictionBoard,
   StakeSelector,
   StreakBanner,
-} from "@/widgets";
-import { formatSol } from "@/shared/lib/format";
-import { useMatchFeed } from "@/features/feed";
-import { useMakePrediction } from "@/features/prediction";
-import { useProfile } from "@/features/profile";
-import { useSession } from "@/store/session";
-import { PredictionOverlay } from "./prediction-overlay";
+} from '@/widgets';
+import { formatSol } from '@/shared/lib/format';
+import { useMatchFeed } from '@/features/feed';
+import { useMakePrediction } from '@/features/prediction';
+import { useProfile } from '@/features/profile';
+import { useSession } from '@/store/session';
+import { PredictionOverlay } from './prediction-overlay';
 
 export function LiveMatchPage() {
   const feed = useMatchFeed();
@@ -49,14 +49,14 @@ export function LiveMatchPage() {
   return (
     <div className="space-y-3 px-4 py-3">
       <div className="flex items-center justify-between">
-        <span className="font-display text-lg font-extrabold tracking-tight text-lime">
+        <span className="font-display text-lime text-lg font-extrabold tracking-tight">
           CALLED IT
         </span>
         <Link
           to="/wallet"
-          className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-lime"
+          className="border-border bg-card text-foreground hover:border-lime flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-xs transition-colors"
         >
-          <Wallet className="size-3.5 text-lime" />
+          <Wallet className="text-lime size-3.5" />
           {formatSol(balance)}
         </Link>
       </div>
@@ -90,9 +90,9 @@ export function LiveMatchPage() {
             size="lg"
             disabled={!canCall}
             onClick={call}
-            className="h-14 w-full bg-lime text-base font-bold text-background hover:bg-lime/90 disabled:opacity-40"
+            className="bg-lime text-background hover:bg-lime/90 h-14 w-full text-base font-bold disabled:opacity-40"
           >
-            {makePrediction.isPending ? "Stamping on-chain…" : "CALL IT"}
+            {makePrediction.isPending ? 'Stamping on-chain…' : 'CALL IT'}
             <Zap className="size-5" />
           </Button>
         </>

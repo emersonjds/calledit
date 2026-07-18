@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 /** Zod schemas validate every network boundary (the MSW↔real swap point). */
 
@@ -10,8 +10,8 @@ export const teamInfoSchema = z.object({
 
 export const matchEventSchema = z.object({
   id: z.string(),
-  type: z.enum(["goal", "yellow", "red", "corner", "foul", "sub", "var"]),
-  side: z.enum(["home", "away"]),
+  type: z.enum(['goal', 'yellow', 'red', 'corner', 'foul', 'sub', 'var']),
+  side: z.enum(['home', 'away']),
   clockMin: z.number(),
   player: z.string().optional(),
   detail: z.string().optional(),
@@ -20,7 +20,7 @@ export const matchEventSchema = z.object({
 export const matchSnapshotSchema = z.object({
   matchId: z.string(),
   clockMin: z.number(),
-  period: z.enum(["1H", "HT", "2H", "ET", "PENS", "FT"]),
+  period: z.enum(['1H', 'HT', '2H', 'ET', 'PENS', 'FT']),
   home: teamInfoSchema,
   away: teamInfoSchema,
   score: z.tuple([z.number(), z.number()]),
@@ -33,7 +33,7 @@ export const matchSnapshotSchema = z.object({
 export const walletAccountSchema = z.object({
   address: z.string(),
   balanceSol: z.number(),
-  chain: z.enum(["solana", "evm"]),
+  chain: z.enum(['solana', 'evm']),
   provider: z.string(),
 });
 
@@ -54,14 +54,14 @@ const settlementSchema = z.object({
 export const predictionSchema = z.object({
   id: z.string(),
   matchId: z.string(),
-  market: z.enum(["corner", "card", "goal", "foul"]),
+  market: z.enum(['corner', 'card', 'goal', 'foul']),
   provable: z.boolean(),
   stakeSol: z.number(),
   multiplier: z.number(),
   potentialSol: z.number(),
   atClockMin: z.number(),
   windowMin: z.number(),
-  status: z.enum(["resolving", "won", "lost"]),
+  status: z.enum(['resolving', 'won', 'lost']),
   stamp: stampSchema,
   settlement: settlementSchema.optional(),
 });
@@ -72,11 +72,11 @@ export const historySchema = z.object({
 
 export const walletActivitySchema = z.object({
   id: z.string(),
-  type: z.enum(["deposit", "withdraw", "payout", "stake"]),
+  type: z.enum(['deposit', 'withdraw', 'payout', 'stake']),
   amountSol: z.number(),
   fiatAmount: z.number().optional(),
   method: z.string().optional(),
-  status: z.enum(["settled", "pending"]),
+  status: z.enum(['settled', 'pending']),
   ts: z.number(),
 });
 
@@ -128,4 +128,4 @@ export const leaderboardSchema = z.object({
 
 export type ProfileDto = z.infer<typeof profileSchema>;
 export type LeaderboardDto = z.infer<typeof leaderboardSchema>;
-export type LeaderboardEntry = LeaderboardDto["entries"][number];
+export type LeaderboardEntry = LeaderboardDto['entries'][number];

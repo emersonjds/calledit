@@ -18,7 +18,7 @@ export function formatClock(clockMin: number): string {
 
 export function formatTimeOfDay(ms: number): string {
   const date = new Date(ms);
-  const pad = (part: number) => String(part).padStart(2, "0");
+  const pad = (part: number) => String(part).padStart(2, '0');
   return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
@@ -27,16 +27,16 @@ export function formatMultiplier(value: number): string {
 }
 
 export function formatFiat(amount: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+  return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(amount);
 }
 
 export function formatKickoff(kickoffMs: number): string {
   return new Intl.DateTimeFormat(undefined, {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(new Date(kickoffMs));
 }
 

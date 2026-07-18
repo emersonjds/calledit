@@ -1,5 +1,5 @@
-import { formatSol } from "@/shared/lib/format";
-import { cn } from "@/shared/lib/utils";
+import { formatSol } from '@/shared/lib/format';
+import { cn } from '@/shared/lib/utils';
 
 interface StakeSelectorProps {
   value: number;
@@ -11,10 +11,10 @@ const QUICK_PICKS = [1, 5, 10] as const;
 
 export function StakeSelector({ value, balanceSol, onChange }: StakeSelectorProps) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="border-border bg-card rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs font-semibold tracking-wide text-muted-foreground">STAKE (SOL)</p>
-        <p className="text-xs text-muted-foreground">Balance: {formatSol(balanceSol)}</p>
+        <p className="text-muted-foreground text-xs font-semibold tracking-wide">STAKE (SOL)</p>
+        <p className="text-muted-foreground text-xs">Balance: {formatSol(balanceSol)}</p>
       </div>
       <div className="grid grid-cols-4 gap-2">
         {QUICK_PICKS.map((amount) => (
@@ -23,8 +23,10 @@ export function StakeSelector({ value, balanceSol, onChange }: StakeSelectorProp
             type="button"
             onClick={() => onChange(amount)}
             className={cn(
-              "rounded-lg border py-2 font-mono text-sm font-semibold transition-colors",
-              value === amount ? "border-lime bg-lime/10 text-lime" : "border-border text-foreground hover:border-border/80",
+              'rounded-lg border py-2 font-mono text-sm font-semibold transition-colors',
+              value === amount
+                ? 'border-lime bg-lime/10 text-lime'
+                : 'border-border text-foreground hover:border-border/80',
             )}
           >
             {amount}
@@ -34,8 +36,10 @@ export function StakeSelector({ value, balanceSol, onChange }: StakeSelectorProp
           type="button"
           onClick={() => onChange(balanceSol)}
           className={cn(
-            "rounded-lg border py-2 font-mono text-sm font-semibold transition-colors",
-            value === balanceSol ? "border-lime bg-lime/10 text-lime" : "border-border text-foreground hover:border-border/80",
+            'rounded-lg border py-2 font-mono text-sm font-semibold transition-colors',
+            value === balanceSol
+              ? 'border-lime bg-lime/10 text-lime'
+              : 'border-border text-foreground hover:border-border/80',
           )}
         >
           MAX

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   ArrowDownToLine,
@@ -8,11 +8,11 @@ import {
   Wallet as WalletIcon,
   Landmark,
   Check,
-} from "lucide-react";
-import { Badge } from "@/shared/ui/badge";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Skeleton } from "@/shared/ui/skeleton";
+} from 'lucide-react';
+import { Badge } from '@/shared/ui/badge';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Skeleton } from '@/shared/ui/skeleton';
 import {
   Sheet,
   SheetContent,
@@ -20,14 +20,14 @@ import {
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from "@/shared/ui/sheet";
-import { cn } from "@/shared/lib/utils";
-import { formatFiat, formatSol, formatTimeOfDay } from "@/shared/lib/format";
-import { useDeposit, useWalletOverview, useWithdraw } from "@/features/wallet";
-import type { ActivityType, WalletActivity, WalletOverview } from "@/entities/wallet";
+} from '@/shared/ui/sheet';
+import { cn } from '@/shared/lib/utils';
+import { formatFiat, formatSol, formatTimeOfDay } from '@/shared/lib/format';
+import { useDeposit, useWalletOverview, useWithdraw } from '@/features/wallet';
+import type { ActivityType, WalletActivity, WalletOverview } from '@/entities/wallet';
 
-type SheetMode = "cash-out" | "add-funds" | null;
-type PayoutMethod = "PIX" | "Bank transfer";
+type SheetMode = 'cash-out' | 'add-funds' | null;
+type PayoutMethod = 'PIX' | 'Bank transfer';
 
 const CASH_OUT_FEE_RATE = 0.015;
 
@@ -49,7 +49,7 @@ export function WalletPage() {
           type="button"
           onClick={() => navigate(-1)}
           aria-label="Go back"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground flex size-11 shrink-0 items-center justify-center rounded-full"
         >
           <ArrowLeft className="size-5" />
         </button>
@@ -70,22 +70,22 @@ export function WalletPage() {
           <div className="grid grid-cols-2 gap-3">
             <Button
               size="lg"
-              onClick={() => setSheetMode("cash-out")}
-              className="h-14 gap-1.5 bg-flame text-base font-bold text-background hover:bg-flame/90"
+              onClick={() => setSheetMode('cash-out')}
+              className="bg-flame text-background hover:bg-flame/90 h-14 gap-1.5 text-base font-bold"
             >
               <ArrowUpFromLine className="size-4" /> Cash out
             </Button>
             <Button
               size="lg"
-              onClick={() => setSheetMode("add-funds")}
-              className="h-14 gap-1.5 bg-lime text-base font-bold text-background hover:bg-lime/90"
+              onClick={() => setSheetMode('add-funds')}
+              className="bg-lime text-background hover:bg-lime/90 h-14 gap-1.5 text-base font-bold"
             >
               <ArrowDownToLine className="size-4" /> Add funds
             </Button>
           </div>
 
-          <div className="flex items-start gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-xs text-muted-foreground">
-            <Landmark className="mt-0.5 size-3.5 shrink-0 text-lime" />
+          <div className="border-border bg-card text-muted-foreground flex items-start gap-2 rounded-xl border px-3 py-2.5 text-xs">
+            <Landmark className="text-lime mt-0.5 size-3.5 shrink-0" />
             <p>
               SOL is converted to {overview.currency} via a licensed ramp partner and settled to
               your bank. Non-custodial.
@@ -95,15 +95,15 @@ export function WalletPage() {
           <ActivityList activity={overview.activity} />
 
           <CashOutSheet
-            open={sheetMode === "cash-out"}
-            onOpenChange={(open) => setSheetMode(open ? "cash-out" : null)}
+            open={sheetMode === 'cash-out'}
+            onOpenChange={(open) => setSheetMode(open ? 'cash-out' : null)}
             balanceSol={overview.balanceSol}
             fiatRate={overview.fiatRate}
             currency={overview.currency}
           />
           <AddFundsSheet
-            open={sheetMode === "add-funds"}
-            onOpenChange={(open) => setSheetMode(open ? "add-funds" : null)}
+            open={sheetMode === 'add-funds'}
+            onOpenChange={(open) => setSheetMode(open ? 'add-funds' : null)}
             fiatRate={overview.fiatRate}
             currency={overview.currency}
           />
@@ -119,15 +119,15 @@ interface BalanceHeroProps {
 
 function BalanceHero({ overview }: BalanceHeroProps) {
   return (
-    <div className="rounded-2xl border border-lime/40 bg-card px-5 py-6 text-center glow-lime">
-      <p className="text-[11px] tracking-widest text-muted-foreground">TOTAL BALANCE</p>
-      <p className="mt-1 font-mono text-4xl font-bold text-lime">
+    <div className="border-lime/40 bg-card glow-lime rounded-2xl border px-5 py-6 text-center">
+      <p className="text-muted-foreground text-[11px] tracking-widest">TOTAL BALANCE</p>
+      <p className="text-lime mt-1 font-mono text-4xl font-bold">
         {formatSol(overview.balanceSol)}
       </p>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-1 text-sm">
         ≈ {formatFiat(overview.balanceSol * overview.fiatRate, overview.currency)}
       </p>
-      <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+      <p className="text-muted-foreground mt-3 font-mono text-[11px]">
         1 SOL ≈ {formatFiat(overview.fiatRate, overview.currency)}
       </p>
     </div>
@@ -141,9 +141,9 @@ interface ActivityListProps {
 function ActivityList({ activity }: ActivityListProps) {
   return (
     <div className="space-y-2">
-      <h2 className="text-xs font-semibold tracking-widest text-muted-foreground">ACTIVITY</h2>
+      <h2 className="text-muted-foreground text-xs font-semibold tracking-widest">ACTIVITY</h2>
       {activity.length === 0 ? (
-        <p className="pt-6 text-center text-sm text-muted-foreground">
+        <p className="text-muted-foreground pt-6 text-center text-sm">
           No activity yet. Add funds to get started.
         </p>
       ) : (
@@ -164,36 +164,36 @@ const ACTIVITY_META: Record<
     icon: typeof ArrowDownToLine;
     iconClass: string;
     amountClass: string;
-    sign: "+" | "−";
+    sign: '+' | '−';
   }
 > = {
   deposit: {
-    label: "Added funds",
+    label: 'Added funds',
     icon: ArrowDownToLine,
-    iconClass: "text-lime",
-    amountClass: "text-lime",
-    sign: "+",
+    iconClass: 'text-lime',
+    amountClass: 'text-lime',
+    sign: '+',
   },
   withdraw: {
-    label: "Cash out",
+    label: 'Cash out',
     icon: ArrowUpFromLine,
-    iconClass: "text-flame",
-    amountClass: "text-flame",
-    sign: "−",
+    iconClass: 'text-flame',
+    amountClass: 'text-flame',
+    sign: '−',
   },
   payout: {
-    label: "Prediction payout",
+    label: 'Prediction payout',
     icon: Check,
-    iconClass: "text-lime",
-    amountClass: "text-lime",
-    sign: "+",
+    iconClass: 'text-lime',
+    amountClass: 'text-lime',
+    sign: '+',
   },
   stake: {
-    label: "Call staked",
+    label: 'Call staked',
     icon: WalletIcon,
-    iconClass: "text-muted-foreground",
-    amountClass: "text-muted-foreground",
-    sign: "−",
+    iconClass: 'text-muted-foreground',
+    amountClass: 'text-muted-foreground',
+    sign: '−',
   },
 };
 
@@ -206,10 +206,10 @@ function ActivityRow({ activity }: ActivityRowProps) {
   const Icon = meta.icon;
 
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5">
+    <div className="border-border bg-card flex items-center gap-3 rounded-xl border px-3 py-2.5">
       <span
         className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-full bg-background",
+          'bg-background flex size-9 shrink-0 items-center justify-center rounded-full',
           meta.iconClass,
         )}
       >
@@ -217,22 +217,22 @@ function ActivityRow({ activity }: ActivityRowProps) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold">{meta.label}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {activity.method ?? "—"} · {formatTimeOfDay(activity.ts)}
+        <p className="text-muted-foreground truncate text-xs">
+          {activity.method ?? '—'} · {formatTimeOfDay(activity.ts)}
         </p>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
-        <span className={cn("font-mono text-sm font-semibold", meta.amountClass)}>
+        <span className={cn('font-mono text-sm font-semibold', meta.amountClass)}>
           {meta.sign}
           {formatSol(activity.amountSol)}
         </span>
         <Badge
           variant="outline"
           className={cn(
-            "px-1.5 py-0 text-[10px]",
-            activity.status === "pending"
-              ? "border-flame/50 text-flame"
-              : "border-border text-muted-foreground",
+            'px-1.5 py-0 text-[10px]',
+            activity.status === 'pending'
+              ? 'border-flame/50 text-flame'
+              : 'border-border text-muted-foreground',
           )}
         >
           {activity.status}
@@ -252,8 +252,8 @@ interface CashOutSheetProps {
 
 function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: CashOutSheetProps) {
   const withdraw = useWithdraw();
-  const [amountInput, setAmountInput] = useState("");
-  const [method, setMethod] = useState<PayoutMethod>("PIX");
+  const [amountInput, setAmountInput] = useState('');
+  const [method, setMethod] = useState<PayoutMethod>('PIX');
 
   const amount = parseAmount(amountInput);
   const valid = amount > 0 && amount <= balanceSol;
@@ -265,8 +265,8 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
       { amountSol: amount, method },
       {
         onSuccess: () => {
-          toast.success("Cash out started — settling to your bank");
-          setAmountInput("");
+          toast.success('Cash out started — settling to your bank');
+          setAmountInput('');
           onOpenChange(false);
         },
       },
@@ -275,7 +275,7 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl border-border bg-card">
+      <SheetContent side="bottom" className="border-border bg-card rounded-t-2xl">
         <SheetHeader>
           <SheetTitle className="font-display text-lg">Cash out</SheetTitle>
           <SheetDescription>Convert SOL to {currency} and send it to your bank.</SheetDescription>
@@ -283,7 +283,7 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
 
         <div className="space-y-4 px-4">
           <div className="space-y-1.5">
-            <label htmlFor="cash-out-amount" className="text-xs text-muted-foreground">
+            <label htmlFor="cash-out-amount" className="text-muted-foreground text-xs">
               Amount (SOL)
             </label>
             <div className="flex items-center gap-2">
@@ -299,26 +299,26 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
               <Button
                 type="button"
                 variant="outline"
-                className="h-12 shrink-0 border-border"
+                className="border-border h-12 shrink-0"
                 onClick={() => setAmountInput(String(balanceSol))}
               >
                 MAX
               </Button>
             </div>
-            <p className="text-[11px] text-muted-foreground">Available: {formatSol(balanceSol)}</p>
+            <p className="text-muted-foreground text-[11px]">Available: {formatSol(balanceSol)}</p>
           </div>
 
           <div className="flex gap-2">
-            {(["PIX", "Bank transfer"] as const).map((option) => (
+            {(['PIX', 'Bank transfer'] as const).map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setMethod(option)}
                 className={cn(
-                  "h-11 flex-1 rounded-lg border text-sm font-semibold transition-colors",
+                  'h-11 flex-1 rounded-lg border text-sm font-semibold transition-colors',
                   method === option
-                    ? "border-lime bg-lime/10 text-lime"
-                    : "border-border text-muted-foreground",
+                    ? 'border-lime bg-lime/10 text-lime'
+                    : 'border-border text-muted-foreground',
                 )}
               >
                 {option}
@@ -326,10 +326,10 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
             ))}
           </div>
 
-          <div className="rounded-xl border border-border bg-background px-3 py-3">
-            <p className="text-xs text-muted-foreground">You receive ≈</p>
+          <div className="border-border bg-background rounded-xl border px-3 py-3">
+            <p className="text-muted-foreground text-xs">You receive ≈</p>
             <p className="font-mono text-xl font-bold">{formatFiat(receiveFiat, currency)}</p>
-            <p className="mt-1 text-[11px] text-muted-foreground">1.5% network + ramp fee</p>
+            <p className="text-muted-foreground mt-1 text-[11px]">1.5% network + ramp fee</p>
           </div>
         </div>
 
@@ -338,9 +338,9 @@ function CashOutSheet({ open, onOpenChange, balanceSol, fiatRate, currency }: Ca
             size="lg"
             disabled={!valid || withdraw.isPending}
             onClick={confirm}
-            className="h-12 w-full bg-flame text-background hover:bg-flame/90 disabled:opacity-40"
+            className="bg-flame text-background hover:bg-flame/90 h-12 w-full disabled:opacity-40"
           >
-            {withdraw.isPending ? "Processing…" : "Confirm cash out"}
+            {withdraw.isPending ? 'Processing…' : 'Confirm cash out'}
           </Button>
         </SheetFooter>
       </SheetContent>
@@ -357,7 +357,7 @@ interface AddFundsSheetProps {
 
 function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheetProps) {
   const deposit = useDeposit();
-  const [amountInput, setAmountInput] = useState("");
+  const [amountInput, setAmountInput] = useState('');
 
   const amount = parseAmount(amountInput);
   const valid = amount > 0;
@@ -367,8 +367,8 @@ function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheet
     if (!valid) return;
     deposit.mutate(amount, {
       onSuccess: () => {
-        toast.success("Funds added");
-        setAmountInput("");
+        toast.success('Funds added');
+        setAmountInput('');
         onOpenChange(false);
       },
     });
@@ -376,7 +376,7 @@ function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheet
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl border-border bg-card">
+      <SheetContent side="bottom" className="border-border bg-card rounded-t-2xl">
         <SheetHeader>
           <SheetTitle className="font-display text-lg">Add funds</SheetTitle>
           <SheetDescription>Buy SOL with {currency} to fund your calls.</SheetDescription>
@@ -384,7 +384,7 @@ function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheet
 
         <div className="space-y-4 px-4">
           <div className="space-y-1.5">
-            <label htmlFor="add-funds-amount" className="text-xs text-muted-foreground">
+            <label htmlFor="add-funds-amount" className="text-muted-foreground text-xs">
               Amount (SOL)
             </label>
             <Input
@@ -398,8 +398,8 @@ function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheet
             />
           </div>
 
-          <div className="rounded-xl border border-border bg-background px-3 py-3">
-            <p className="text-xs text-muted-foreground">You pay ≈</p>
+          <div className="border-border bg-background rounded-xl border px-3 py-3">
+            <p className="text-muted-foreground text-xs">You pay ≈</p>
             <p className="font-mono text-xl font-bold">{formatFiat(payFiat, currency)}</p>
           </div>
         </div>
@@ -409,9 +409,9 @@ function AddFundsSheet({ open, onOpenChange, fiatRate, currency }: AddFundsSheet
             size="lg"
             disabled={!valid || deposit.isPending}
             onClick={confirm}
-            className="h-12 w-full bg-lime text-background hover:bg-lime/90 disabled:opacity-40"
+            className="bg-lime text-background hover:bg-lime/90 h-12 w-full disabled:opacity-40"
           >
-            {deposit.isPending ? "Processing…" : "Confirm add funds"}
+            {deposit.isPending ? 'Processing…' : 'Confirm add funds'}
           </Button>
         </SheetFooter>
       </SheetContent>

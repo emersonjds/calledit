@@ -2,7 +2,7 @@
 
 # ⚡ Called It
 
-### Prove you called it *first*.
+### Prove you called it _first_.
 
 A live, on-chain-verified football prediction game for the **FIFA World Cup 2026**.
 Commit a call **before** it happens — it gets stamped on Solana — and settlement proves you were first. Nobody can fake a past prediction.
@@ -34,11 +34,11 @@ Commit a call **before** it happens — it gets stamped on Solana — and settle
 
 ## 🎯 What it is
 
-Every other fan app is a live scoreboard with reactions — all of which work **without** a blockchain, so they never actually prove anything. **Called It** makes the tamper-evident on-chain timestamp *the product*:
+Every other fan app is a live scoreboard with reactions — all of which work **without** a blockchain, so they never actually prove anything. **Called It** makes the tamper-evident on-chain timestamp _the product_:
 
 > You tap a prediction (**next Corner? Card? Goal?**) **before** it happens. The commitment is stamped on-chain the instant you tap — transaction hash, timestamp, `seq`, `epochDay`. When the event resolves through the **TxODDS TxLINE** feed (itself anchored on Solana), a settlement predicate compares the two timestamps and **proves you called it first**.
 
-It's the one design where removing the on-chain layer *breaks* the product. Skill, not luck — whoever reads the game better earns more.
+It's the one design where removing the on-chain layer _breaks_ the product. Skill, not luck — whoever reads the game better earns more.
 
 Built for the **Superteam × TxODDS World Cup Hackathon → Consumer & Fan Experiences** track (also fits Prediction Markets).
 
@@ -58,7 +58,7 @@ flowchart LR
 
 - **Commit-before-reveal predictions** — stamped on-chain with `seq` + `epochDay` derived from the proof timestamp (never `Date.now()`).
 - **Instant settlement** — resolves the moment the event fires; payout lands immediately.
-- **Skill streaks** — consecutive wins raise the multiplier (3 → 1.5×, 5 → 2×); a loss resets it. The anti-*tigrinho*: adrenaline without rigged RNG.
+- **Skill streaks** — consecutive wins raise the multiplier (3 → 1.5×, 5 → 2×); a loss resets it. The anti-_tigrinho_: adrenaline without rigged RNG.
 - **Provable track record** — an unforgeable prediction history drives accuracy, rank, and a global leaderboard. Impossible to fake a good record.
 - **Wallet & on/off-ramp** — balance in SOL with a local-fiat view; cash out (SOL → BRL via PIX) and add funds, with a typed activity feed.
 - **Upcoming matches** — a compact calendar of the next 5 World Cup fixtures with live countdowns.
@@ -71,17 +71,17 @@ flowchart LR
 
 TxLINE ships **two layers**, and confusing them is what kills projects on demo day:
 
-| Layer | Content | On-chain provable? |
-| --- | --- | --- |
-| **Rich feed** | goal author, minute, VAR, foul type, `Pct` | ❌ UI / narration only |
+| Layer               | Content                                            | On-chain provable?                |
+| ------------------- | -------------------------------------------------- | --------------------------------- |
+| **Rich feed**       | goal author, minute, VAR, foul type, `Pct`         | ❌ UI / narration only            |
 | **Merkle (8 keys)** | goals, yellow, red, corners — per team, per period | ✅ proven by `stat-validation-v3` |
 
-| UI market | Backed by | Provable |
-| --- | --- | --- |
-| **Goal** | keys 1 / 2 | ✅ |
-| **Card** | keys 3–6 | ✅ |
-| **Corner** | keys 7 / 8 | ✅ |
-| **Foul** | rich feed only | ❌ *(for-fun market, never routed to settlement)* |
+| UI market  | Backed by      | Provable                                          |
+| ---------- | -------------- | ------------------------------------------------- |
+| **Goal**   | keys 1 / 2     | ✅                                                |
+| **Card**   | keys 3–6       | ✅                                                |
+| **Corner** | keys 7 / 8     | ✅                                                |
+| **Foul**   | rich feed only | ❌ _(for-fun market, never routed to settlement)_ |
 
 **Golden rule: prove the result, narrate the rest.**
 
@@ -89,17 +89,17 @@ TxLINE ships **two layers**, and confusing them is what kills projects on demo d
 
 ## 🧱 Tech stack
 
-| Layer | Choice |
-| --- | --- |
-| **Framework** | React 19 + TypeScript 7 (strict, no `any`) |
-| **Build / dev** | Vite 7, PWA via `vite-plugin-pwa` |
-| **Styling** | Tailwind CSS 4 + shadcn/ui (themed to brand tokens) |
-| **Server state** | TanStack **React Query** (feed polling, mutations) |
-| **Session state** | **Zustand** (wallet, streak, selection) |
-| **Boundaries** | **Zod** schemas validate every API response |
-| **Mocked backend** | **MSW** — deterministic match engine + on-chain settlement simulation |
-| **Testing** | Vitest |
-| **Package manager** | pnpm |
+| Layer               | Choice                                                                |
+| ------------------- | --------------------------------------------------------------------- |
+| **Framework**       | React 19 + TypeScript 7 (strict, no `any`)                            |
+| **Build / dev**     | Vite 7, PWA via `vite-plugin-pwa`                                     |
+| **Styling**         | Tailwind CSS 4 + shadcn/ui (themed to brand tokens)                   |
+| **Server state**    | TanStack **React Query** (feed polling, mutations)                    |
+| **Session state**   | **Zustand** (wallet, streak, selection)                               |
+| **Boundaries**      | **Zod** schemas validate every API response                           |
+| **Mocked backend**  | **MSW** — deterministic match engine + on-chain settlement simulation |
+| **Testing**         | Vitest                                                                |
+| **Package manager** | pnpm                                                                  |
 
 ---
 
@@ -107,7 +107,7 @@ TxLINE ships **two layers**, and confusing them is what kills projects on demo d
 
 The domain is **production-shaped**: transaction building, PDA / `seq` / `epochDay` handling, the wallet adapter, and the settlement predicate are all real. **MSW stands in only at the network boundary** (the TxLINE feed + Solana RPC) — it never fakes the domain. When the real backend lands, you swap MSW for it at a single seam (`src/shared/api`) with zero UI changes.
 
-**Feature-Sliced Design** — imports only ever point *downward*:
+**Feature-Sliced Design** — imports only ever point _downward_:
 
 ```
 src/
@@ -133,13 +133,13 @@ pnpm install
 pnpm dev          # → http://localhost:5173
 ```
 
-| Script | Does |
-| --- | --- |
-| `pnpm dev` | Vite dev server (MSW backend auto-starts) |
-| `pnpm build` | Type-check + production build into `out/` |
-| `pnpm preview` | Serve the production build locally |
-| `pnpm test` | Run unit tests (Vitest) |
-| `pnpm type-check` | `tsc -b` across the project |
+| Script            | Does                                      |
+| ----------------- | ----------------------------------------- |
+| `pnpm dev`        | Vite dev server (MSW backend auto-starts) |
+| `pnpm build`      | Type-check + production build into `out/` |
+| `pnpm preview`    | Serve the production build locally        |
+| `pnpm test`       | Run unit tests (Vitest)                   |
+| `pnpm type-check` | `tsc -b` across the project               |
 
 > The whole demo runs standalone on MSW — no backend, keys, or network needed. Balance and history persist in `localStorage`.
 

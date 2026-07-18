@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { MarketId } from "@/entities/prediction";
-import type { ChainKind, WalletAccount } from "@/entities/wallet";
-import { DEMO_MATCH_ID } from "@/mocks/config";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { MarketId } from '@/entities/prediction';
+import type { ChainKind, WalletAccount } from '@/entities/wallet';
+import { DEMO_MATCH_ID } from '@/mocks/config';
 
 interface SessionState {
   address: string | null;
@@ -38,7 +38,7 @@ export const useSession = create<SessionState>()(
       setActivePrediction: (id) => set({ activePredictionId: id }),
     }),
     {
-      name: "called-it:session",
+      name: 'called-it:session',
       partialize: (state) => ({
         address: state.address,
         provider: state.provider,

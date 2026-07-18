@@ -1,6 +1,6 @@
-import type { MatchEventType } from "@/entities/match";
+import type { MatchEventType } from '@/entities/match';
 
-export type MarketId = "corner" | "card" | "goal" | "foul";
+export type MarketId = 'corner' | 'card' | 'goal' | 'foul';
 
 export interface MarketDef {
   id: MarketId;
@@ -21,45 +21,40 @@ export interface MarketDef {
  */
 export const MARKETS: Record<MarketId, MarketDef> = {
   corner: {
-    id: "corner",
-    label: "Corner",
-    eventType: "corner",
+    id: 'corner',
+    label: 'Corner',
+    eventType: 'corner',
     provable: true,
     keys: [7, 8],
     baseMultiplier: 2.4,
   },
   card: {
-    id: "card",
-    label: "Card",
-    eventType: "yellow",
+    id: 'card',
+    label: 'Card',
+    eventType: 'yellow',
     provable: true,
     keys: [3, 4, 5, 6],
     baseMultiplier: 3.1,
   },
   goal: {
-    id: "goal",
-    label: "Goal",
-    eventType: "goal",
+    id: 'goal',
+    label: 'Goal',
+    eventType: 'goal',
     provable: true,
     keys: [1, 2],
     baseMultiplier: 8.5,
   },
   foul: {
-    id: "foul",
-    label: "Foul",
-    eventType: "foul",
+    id: 'foul',
+    label: 'Foul',
+    eventType: 'foul',
     provable: false,
     keys: [],
     baseMultiplier: 1.8,
   },
 };
 
-export const MARKET_LIST: MarketDef[] = [
-  MARKETS.corner,
-  MARKETS.card,
-  MARKETS.goal,
-  MARKETS.foul,
-];
+export const MARKET_LIST: MarketDef[] = [MARKETS.corner, MARKETS.card, MARKETS.goal, MARKETS.foul];
 
 export function isMarketId(value: string): value is MarketId {
   return value in MARKETS;

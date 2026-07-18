@@ -10,10 +10,7 @@ function round2(value: number): number {
 }
 
 /** Effective multiplier locked at commit: market base × streak bonus. */
-export function effectiveMultiplier(
-  baseMultiplier: number,
-  currentStreak: number,
-): number {
+export function effectiveMultiplier(baseMultiplier: number, currentStreak: number): number {
   return round2(baseMultiplier * streakBonus(currentStreak));
 }
 

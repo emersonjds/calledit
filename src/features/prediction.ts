@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { MarketId, Prediction } from "@/entities/prediction";
-import { api } from "@/shared/api";
-import { useSession } from "@/store/session";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { MarketId, Prediction } from '@/entities/prediction';
+import { api } from '@/shared/api';
+import { useSession } from '@/store/session';
 
 export interface CommitArgs {
   market: MarketId;
@@ -17,7 +17,7 @@ export function useMakePrediction() {
 
   return useMutation({
     mutationFn: (args: CommitArgs) => {
-      if (!address) throw new Error("Connect a wallet first");
+      if (!address) throw new Error('Connect a wallet first');
       return api.commitPrediction({
         matchId,
         market: args.market,
@@ -27,7 +27,7 @@ export function useMakePrediction() {
     },
     onSuccess: (prediction) => {
       setActive(prediction.id);
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ['me'] });
     },
   });
 }
@@ -36,17 +36,17 @@ export function useMakePrediction() {
 export function usePredictionStatus(id: string | null) {
   const queryClient = useQueryClient();
   return useQuery<Prediction>({
-    queryKey: ["prediction", id],
+    queryKey: ['prediction', id],
     queryFn: async () => {
       const prediction = await api.getPrediction(id as string);
-      if (prediction.status !== "resolving") {
-        queryClient.invalidateQueries({ queryKey: ["me"] });
-        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      if (prediction.status !== 'resolving') {
+        queryClient.invalidateQueries({ queryKey: ['me'] });
+        queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       }
       return prediction;
     },
     enabled: id !== null,
     refetchInterval: (query) =>
-      query.state.data && query.state.data.status !== "resolving" ? false : 700,
+      query.state.data && query.state.data.status !== 'resolving' ? false : 700,
   });
 }

@@ -1,6 +1,6 @@
 ---
 name: qa
-description: "On-screen E2E specialist (Playwright) for Called It. Runs the E2E suite, reproduces and validates bugs against the real running app (real browser) with wallet and TxLINE feed mocking, triages failures and visual/functional regressions, and captures PNG evidence. Use proactively after UI/flow changes, before deploy, or to confirm a reported on-screen bug. Complements the `bug` agent (which reviews code); this one validates behavior in the browser."
+description: 'On-screen E2E specialist (Playwright) for Called It. Runs the E2E suite, reproduces and validates bugs against the real running app (real browser) with wallet and TxLINE feed mocking, triages failures and visual/functional regressions, and captures PNG evidence. Use proactively after UI/flow changes, before deploy, or to confirm a reported on-screen bug. Complements the `bug` agent (which reviews code); this one validates behavior in the browser.'
 tools: Read, Grep, Glob, Bash, Edit, Write, mcp__serena__list_dir, mcp__serena__find_file, mcp__serena__search_for_pattern, mcp__serena__find_symbol
 model: sonnet
 ---

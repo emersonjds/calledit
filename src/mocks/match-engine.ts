@@ -6,19 +6,13 @@ import type {
   Period,
   TeamSide,
   WinProbability,
-} from "@/entities/match";
-import { MARKET_LIST } from "@/entities/prediction";
-import {
-  AWAY_TEAM,
-  DEMO_MATCH_ID,
-  HOME_TEAM,
-  MATCH_FULL_MIN,
-  MATCH_MIN_PER_SEC,
-} from "./config";
-import { mulberry32 } from "./prng";
+} from '@/entities/match';
+import { MARKET_LIST } from '@/entities/prediction';
+import { AWAY_TEAM, DEMO_MATCH_ID, HOME_TEAM, MATCH_FULL_MIN, MATCH_MIN_PER_SEC } from './config';
+import { mulberry32 } from './prng';
 
-const HOME_PLAYERS = ["Vinícius Jr", "Rodrygo", "Raphinha", "Bruno G.", "Casemiro"];
-const AWAY_PLAYERS = ["Mbappé", "Griezmann", "Dembélé", "Tchouaméni", "Saliba"];
+const HOME_PLAYERS = ['Vinícius Jr', 'Rodrygo', 'Raphinha', 'Bruno G.', 'Casemiro'];
+const AWAY_PLAYERS = ['Mbappé', 'Griezmann', 'Dembélé', 'Tchouaméni', 'Saliba'];
 
 interface ScheduledEvent extends MatchEvent {
   clockMin: number;
@@ -34,8 +28,8 @@ function place(
   const out: ScheduledEvent[] = [];
   for (let i = 0; i < count; i++) {
     const clockMin = Math.floor(minMinute + rng() * (MATCH_FULL_MIN - minMinute));
-    const side: TeamSide = rng() > 0.5 ? "home" : "away";
-    const players = side === "home" ? HOME_PLAYERS : AWAY_PLAYERS;
+    const side: TeamSide = rng() > 0.5 ? 'home' : 'away';
+    const players = side === 'home' ? HOME_PLAYERS : AWAY_PLAYERS;
     out.push({
       id: `${type}-${i}-${clockMin}`,
       type,
@@ -51,29 +45,29 @@ function place(
 export function buildSchedule(seed: number): ScheduledEvent[] {
   const rng = mulberry32(seed);
   const events = [
-    ...place(rng, "goal", 2 + Math.floor(rng() * 3), 4),
-    ...place(rng, "yellow", 3 + Math.floor(rng() * 3), 8),
-    ...place(rng, "red", rng() > 0.75 ? 1 : 0, 55),
-    ...place(rng, "corner", 8 + Math.floor(rng() * 5), 3),
-    ...place(rng, "foul", 14 + Math.floor(rng() * 8), 2),
+    ...place(rng, 'goal', 2 + Math.floor(rng() * 3), 4),
+    ...place(rng, 'yellow', 3 + Math.floor(rng() * 3), 8),
+    ...place(rng, 'red', rng() > 0.75 ? 1 : 0, 55),
+    ...place(rng, 'corner', 8 + Math.floor(rng() * 5), 3),
+    ...place(rng, 'foul', 14 + Math.floor(rng() * 8), 2),
   ];
   return events.sort((a, b) => a.clockMin - b.clockMin);
 }
 
 function periodFor(clockMin: number): Period {
-  if (clockMin < 45) return "1H";
-  if (clockMin < 46) return "HT";
-  if (clockMin <= 90) return "2H";
-  if (clockMin < MATCH_FULL_MIN) return "ET";
-  return "FT";
+  if (clockMin < 45) return '1H';
+  if (clockMin < 46) return 'HT';
+  if (clockMin <= 90) return '2H';
+  if (clockMin < MATCH_FULL_MIN) return 'ET';
+  return 'FT';
 }
 
 function scoreAt(events: ScheduledEvent[], clockMin: number): [number, number] {
   let home = 0;
   let away = 0;
   for (const event of events) {
-    if (event.type === "goal" && event.clockMin <= clockMin) {
-      if (event.side === "home") home++;
+    if (event.type === 'goal' && event.clockMin <= clockMin) {
+      if (event.side === 'home') home++;
       else away++;
     }
   }
@@ -132,7 +126,7 @@ export function snapshotAt({ seed, elapsedSec }: EngineInput): MatchSnapshot {
     pct: winProbability(score, clockMin),
     events,
     markets: liveMultipliers(clockMin),
-    live: period !== "FT",
+    live: period !== 'FT',
   };
 }
 
@@ -147,9 +141,7 @@ export function findResolvingEvent(
   return (
     schedule.find(
       (event) =>
-        event.type === type &&
-        event.clockMin > fromMin &&
-        event.clockMin <= fromMin + windowMin,
+        event.type === type && event.clockMin > fromMin && event.clockMin <= fromMin + windowMin,
     ) ?? null
   );
 }

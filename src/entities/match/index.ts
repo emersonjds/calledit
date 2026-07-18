@@ -7,5 +7,5 @@ export type {
   WinProbability,
   MarketQuote,
   MatchSnapshot,
-} from "./types";
-export { periodKey, periodLabel } from "./periods";
+} from './types';
+export { periodKey, periodLabel } from './periods';

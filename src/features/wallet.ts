@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { WalletOverview } from "@/entities/wallet";
-import { api } from "@/shared/api";
-import { useSession } from "@/store/session";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { WalletOverview } from '@/entities/wallet';
+import { api } from '@/shared/api';
+import { useSession } from '@/store/session';
 
 /** Connect a wallet provider (Phantom / MetaMask / guest) through the adapter seam. */
 export function useConnectWallet() {
@@ -15,7 +15,7 @@ export function useConnectWallet() {
 export function useWalletOverview() {
   const address = useSession((state) => state.address);
   return useQuery<WalletOverview>({
-    queryKey: ["wallet", address],
+    queryKey: ['wallet', address],
     queryFn: () => api.getWallet(address as string),
     enabled: address !== null,
     refetchInterval: 3000,
@@ -27,8 +27,8 @@ function useWalletMutation<TArgs>(mutationFn: (args: TArgs) => Promise<WalletOve
   return useMutation({
     mutationFn,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wallet"] });
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      queryClient.invalidateQueries({ queryKey: ['me'] });
     },
   });
 }

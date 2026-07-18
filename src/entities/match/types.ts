@@ -1,15 +1,8 @@
-export type Period = "1H" | "HT" | "2H" | "ET" | "PENS" | "FT";
+export type Period = '1H' | 'HT' | '2H' | 'ET' | 'PENS' | 'FT';
 
-export type MatchEventType =
-  | "goal"
-  | "yellow"
-  | "red"
-  | "corner"
-  | "foul"
-  | "sub"
-  | "var";
+export type MatchEventType = 'goal' | 'yellow' | 'red' | 'corner' | 'foul' | 'sub' | 'var';
 
-export type TeamSide = "home" | "away";
+export type TeamSide = 'home' | 'away';
 
 export interface TeamInfo {
   code: string; // e.g. "BRA"

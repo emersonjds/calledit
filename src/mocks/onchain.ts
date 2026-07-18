@@ -1,4 +1,4 @@
-import type { MatchEvent, MatchEventType } from "@/entities/match";
+import type { MatchEvent, MatchEventType } from '@/entities/match';
 import {
   MARKETS,
   accuracyPct,
@@ -6,10 +6,10 @@ import {
   potentialPayout,
   type MarketId,
   type Prediction,
-} from "@/entities/prediction";
-import type { ProfileDto, LeaderboardDto } from "@/shared/api";
-import { MATCH_MIN_PER_SEC, WINDOW_MIN } from "./config";
-import { findResolvingEvent } from "./match-engine";
+} from '@/entities/prediction';
+import type { ProfileDto, LeaderboardDto } from '@/shared/api';
+import { MATCH_MIN_PER_SEC, WINDOW_MIN } from './config';
+import { findResolvingEvent } from './match-engine';
 import {
   allLedgers,
   commitPersist,
@@ -19,12 +19,12 @@ import {
   getResolution,
   nextSeq,
   saveResolution,
-} from "./state";
+} from './state';
 
-const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
 function base58(length: number): string {
-  let out = "";
+  let out = '';
   for (let i = 0; i < length; i++) {
     out += BASE58[Math.floor(Math.random() * BASE58.length)];
   }
@@ -33,7 +33,7 @@ function base58(length: number): string {
 
 /** Card resolves on yellow OR red; other markets on their single event type. */
 function resolvingTypes(market: MarketId): MatchEventType[] {
-  if (market === "card") return ["yellow", "red"];
+  if (market === 'card') return ['yellow', 'red'];
   return [MARKETS[market].eventType];
 }
 
@@ -57,14 +57,12 @@ export interface CommitInput {
   address: string;
 }
 
-export type CommitResult =
-  | { ok: true; prediction: Prediction }
-  | { ok: false; error: string };
+export type CommitResult = { ok: true; prediction: Prediction } | { ok: false; error: string };
 
 export function commit({ matchId, market, stakeSol, address }: CommitInput): CommitResult {
   const ledger = getLedger(address);
-  if (stakeSol <= 0) return { ok: false, error: "Stake must be positive" };
-  if (stakeSol > ledger.balanceSol) return { ok: false, error: "Insufficient balance" };
+  if (stakeSol <= 0) return { ok: false, error: 'Stake must be positive' };
+  if (stakeSol > ledger.balanceSol) return { ok: false, error: 'Insufficient balance' };
 
   const def = MARKETS[market];
   const multiplier = effectiveMultiplier(def.baseMultiplier, ledger.streak);
@@ -83,7 +81,7 @@ export function commit({ matchId, market, stakeSol, address }: CommitInput): Com
     potentialSol,
     atClockMin,
     windowMin,
-    status: "resolving",
+    status: 'resolving',
     stamp: {
       txHash: base58(44),
       stampedAt,
@@ -97,10 +95,10 @@ export function commit({ matchId, market, stakeSol, address }: CommitInput): Com
   ledger.predictions.unshift(prediction);
   ledger.activity.unshift({
     id: `act_${prediction.stamp.seq}`,
-    type: "stake",
+    type: 'stake',
     amountSol: stakeSol,
     method: `${def.label} call`,
-    status: "settled",
+    status: 'settled',
     ts: stampedAt,
   });
 
@@ -123,7 +121,7 @@ export function getPrediction(id: string): Prediction | null {
   const ledger = getLedger(record.address);
   const prediction = ledger.predictions.find((entry) => entry.id === id);
   if (!prediction) return null;
-  if (prediction.status !== "resolving" || Date.now() < record.resolveAtMs) {
+  if (prediction.status !== 'resolving' || Date.now() < record.resolveAtMs) {
     return prediction;
   }
 
@@ -136,21 +134,21 @@ export function getPrediction(id: string): Prediction | null {
   const won = event !== null;
 
   if (won) {
-    prediction.status = "won";
+    prediction.status = 'won';
     ledger.balanceSol = Math.round((ledger.balanceSol + prediction.potentialSol) * 100) / 100;
     ledger.streak += 1;
     ledger.bestStreak = Math.max(ledger.bestStreak, ledger.streak);
     ledger.wonCalls += 1;
     ledger.activity.unshift({
       id: `act_${base58(6)}`,
-      type: "payout",
+      type: 'payout',
       amountSol: prediction.potentialSol,
-      method: "settlement",
-      status: "settled",
+      method: 'settlement',
+      status: 'settled',
       ts: Date.now(),
     });
   } else {
-    prediction.status = "lost";
+    prediction.status = 'lost';
     ledger.streak = 0;
   }
 
@@ -190,13 +188,13 @@ interface Board {
 }
 
 const BOTS: Board[] = [
-  { handle: "0xGoalOracle", address: "bot1", accuracy: 74, streak: 6, calls: 188 },
-  { handle: "CornerKing", address: "bot2", accuracy: 71, streak: 4, calls: 240 },
-  { handle: "MerkleMbappe", address: "bot3", accuracy: 69, streak: 9, calls: 156 },
-  { handle: "chain_samba", address: "bot4", accuracy: 66, streak: 2, calls: 312 },
-  { handle: "ProofOfPitch", address: "bot5", accuracy: 63, streak: 3, calls: 98 },
-  { handle: "solana_ultra", address: "bot6", accuracy: 61, streak: 1, calls: 144 },
-  { handle: "OffsideTrap", address: "bot7", accuracy: 58, streak: 0, calls: 76 },
+  { handle: '0xGoalOracle', address: 'bot1', accuracy: 74, streak: 6, calls: 188 },
+  { handle: 'CornerKing', address: 'bot2', accuracy: 71, streak: 4, calls: 240 },
+  { handle: 'MerkleMbappe', address: 'bot3', accuracy: 69, streak: 9, calls: 156 },
+  { handle: 'chain_samba', address: 'bot4', accuracy: 66, streak: 2, calls: 312 },
+  { handle: 'ProofOfPitch', address: 'bot5', accuracy: 63, streak: 3, calls: 98 },
+  { handle: 'solana_ultra', address: 'bot6', accuracy: 61, streak: 1, calls: 144 },
+  { handle: 'OffsideTrap', address: 'bot7', accuracy: 58, streak: 0, calls: 76 },
 ];
 
 function boardEntries(): Board[] {

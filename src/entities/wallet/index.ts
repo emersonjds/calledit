@@ -7,4 +7,4 @@ export type {
   ActivityType,
   WalletActivity,
   WalletOverview,
-} from "./types";
+} from './types';

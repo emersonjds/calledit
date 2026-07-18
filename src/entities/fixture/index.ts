@@ -1,4 +1,4 @@
-import type { TeamInfo } from "@/entities/match";
+import type { TeamInfo } from '@/entities/match';
 
 export interface Fixture {
   id: string;

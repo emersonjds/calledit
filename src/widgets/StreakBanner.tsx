@@ -1,6 +1,6 @@
-import { Flame } from "lucide-react";
-import { streakBonus } from "@/entities/prediction";
-import { formatMultiplier } from "@/shared/lib/format";
+import { Flame } from 'lucide-react';
+import { streakBonus } from '@/entities/prediction';
+import { formatMultiplier } from '@/shared/lib/format';
 
 interface StreakBannerProps {
   streak: number;
@@ -9,7 +9,7 @@ interface StreakBannerProps {
 export function StreakBanner({ streak }: StreakBannerProps) {
   if (streak === 0) {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+      <div className="border-border bg-card text-muted-foreground flex items-center gap-2 rounded-xl border px-4 py-3 text-sm">
         <Flame className="size-4" />
         Build a streak to boost payouts
       </div>
@@ -19,14 +19,18 @@ export function StreakBanner({ streak }: StreakBannerProps) {
   const multiplier = formatMultiplier(streakBonus(streak));
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-flame/40 bg-card px-4 py-3 glow-flame">
+    <div className="border-flame/40 bg-card glow-flame flex items-center justify-between rounded-xl border px-4 py-3">
       <div className="flex items-center gap-2">
-        <Flame className="size-5 text-flame" />
-        <span className="font-display text-sm font-bold tracking-wide text-foreground">{streak} IN A ROW</span>
+        <Flame className="text-flame size-5" />
+        <span className="font-display text-foreground text-sm font-bold tracking-wide">
+          {streak} IN A ROW
+        </span>
       </div>
       <div className="flex flex-col items-end">
-        <span className="font-mono text-lg font-bold text-flame">{multiplier}</span>
-        <span className="text-[10px] font-semibold tracking-wide text-muted-foreground">STREAK BONUS</span>
+        <span className="text-flame font-mono text-lg font-bold">{multiplier}</span>
+        <span className="text-muted-foreground text-[10px] font-semibold tracking-wide">
+          STREAK BONUS
+        </span>
       </div>
     </div>
   );

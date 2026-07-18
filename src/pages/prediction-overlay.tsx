@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { Check, Share2, X } from "lucide-react";
-import { MARKETS } from "@/entities/prediction";
-import { Button } from "@/shared/ui/button";
-import { CountdownRing, OnchainSeal } from "@/widgets";
-import { formatSol, shortHash } from "@/shared/lib/format";
-import { MATCH_MIN_PER_SEC } from "@/mocks/config";
-import { usePredictionStatus } from "@/features/prediction";
-import { useSession } from "@/store/session";
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Check, Share2, X } from 'lucide-react';
+import { MARKETS } from '@/entities/prediction';
+import { Button } from '@/shared/ui/button';
+import { CountdownRing, OnchainSeal } from '@/widgets';
+import { formatSol, shortHash } from '@/shared/lib/format';
+import { MATCH_MIN_PER_SEC } from '@/mocks/config';
+import { usePredictionStatus } from '@/features/prediction';
+import { useSession } from '@/store/session';
 
 export function PredictionOverlay({ id }: { id: string }) {
   const { data: prediction } = usePredictionStatus(id);
@@ -23,7 +23,7 @@ export function PredictionOverlay({ id }: { id: string }) {
   const [secondsLeft, setSecondsLeft] = useState(total);
 
   useEffect(() => {
-    if (!prediction || prediction.status !== "resolving") return;
+    if (!prediction || prediction.status !== 'resolving') return;
     const tick = () => {
       const elapsed = (Date.now() - prediction.stamp.stampedAt) / 1000;
       setSecondsLeft(Math.max(0, total - elapsed));
@@ -36,20 +36,20 @@ export function PredictionOverlay({ id }: { id: string }) {
   if (!prediction) return null;
 
   const marketLabel = MARKETS[prediction.market].label;
-  const won = prediction.status === "won";
+  const won = prediction.status === 'won';
   const settlement = prediction.settlement;
 
   return (
-    <div className="fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col items-center justify-center gap-6 bg-background/98 px-6 py-10 backdrop-blur">
-      {prediction.status === "resolving" && (
+    <div className="bg-background/98 fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col items-center justify-center gap-6 px-6 py-10 backdrop-blur">
+      {prediction.status === 'resolving' && (
         <>
           <OnchainSeal verified stampedAt={prediction.stamp.stampedAt} size={128} />
           <div className="space-y-1 text-center">
-            <p className="text-xs font-semibold tracking-widest text-lime">
+            <p className="text-lime text-xs font-semibold tracking-widest">
               STAMPED ON-CHAIN · VERIFIED
             </p>
             <h2 className="font-display text-2xl font-bold">Prediction Committed</h2>
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="text-muted-foreground font-mono text-xs">
               tx {shortHash(prediction.stamp.txHash)} · seq {prediction.stamp.seq}
             </p>
           </div>
@@ -70,44 +70,44 @@ export function PredictionOverlay({ id }: { id: string }) {
         <>
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="flex items-center gap-2">
-              <h2 className="font-display text-4xl font-extrabold text-lime">CALLED IT!</h2>
-              <Check className="size-9 text-lime" strokeWidth={3} />
+              <h2 className="font-display text-lime text-4xl font-extrabold">CALLED IT!</h2>
+              <Check className="text-lime size-9" strokeWidth={3} />
             </div>
-            <p className="text-xs font-semibold tracking-widest text-muted-foreground">
+            <p className="text-muted-foreground text-xs font-semibold tracking-widest">
               PREDICTION VERIFIED
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs tracking-widest text-muted-foreground">TOTAL PAYOUT</p>
-            <p className="font-display text-5xl font-extrabold text-lime">
+            <p className="text-muted-foreground text-xs tracking-widest">TOTAL PAYOUT</p>
+            <p className="font-display text-lime text-5xl font-extrabold">
               {formatSol(settlement.payoutSol)}
             </p>
           </div>
           <OnchainSeal verified size={112} />
           <div className="space-y-1 text-center text-sm">
-            <p className="font-semibold text-flame">🔥 Won at {prediction.multiplier}x</p>
+            <p className="text-flame font-semibold">🔥 Won at {prediction.multiplier}x</p>
             <p className="text-muted-foreground">
-              You called it{" "}
-              <span className="font-semibold text-foreground">
+              You called it{' '}
+              <span className="text-foreground font-semibold">
                 {settlement.calledSecondsBefore}s
-              </span>{" "}
+              </span>{' '}
               before it happened.
             </p>
-            <p className="font-mono text-xs text-muted-foreground">
+            <p className="text-muted-foreground font-mono text-xs">
               proof {shortHash(settlement.proofId)}
             </p>
           </div>
           <div className="w-full space-y-2">
             <Button
-              className="h-12 w-full bg-lime font-bold text-background hover:bg-lime/90"
+              className="bg-lime text-background hover:bg-lime/90 h-12 w-full font-bold"
               onClick={close}
             >
               Next prediction →
             </Button>
             <Button
               variant="outline"
-              className="w-full border-border"
-              onClick={() => toast.success("Proof link copied to clipboard")}
+              className="border-border w-full"
+              onClick={() => toast.success('Proof link copied to clipboard')}
             >
               <Share2 className="size-4" /> Share proof
             </Button>
@@ -115,22 +115,20 @@ export function PredictionOverlay({ id }: { id: string }) {
         </>
       )}
 
-      {prediction.status === "lost" && (
+      {prediction.status === 'lost' && (
         <>
-          <div className="flex size-28 items-center justify-center rounded-full border-2 border-border">
-            <X className="size-14 text-muted-foreground" />
+          <div className="border-border flex size-28 items-center justify-center rounded-full border-2">
+            <X className="text-muted-foreground size-14" />
           </div>
           <div className="space-y-1 text-center">
-            <h2 className="font-display text-3xl font-bold text-muted-foreground">
-              Not this time
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              No {marketLabel.toLowerCase()} in the window. Streak reset — read the game
-              and go again.
+            <h2 className="font-display text-muted-foreground text-3xl font-bold">Not this time</h2>
+            <p className="text-muted-foreground text-sm">
+              No {marketLabel.toLowerCase()} in the window. Streak reset — read the game and go
+              again.
             </p>
           </div>
           <Button
-            className="h-12 w-full bg-lime font-bold text-background hover:bg-lime/90"
+            className="bg-lime text-background hover:bg-lime/90 h-12 w-full font-bold"
             onClick={close}
           >
             Try again
@@ -143,9 +141,9 @@ export function PredictionOverlay({ id }: { id: string }) {
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-3 py-2">
-      <p className="text-[10px] tracking-widest text-muted-foreground">{label.toUpperCase()}</p>
-      <p className={`font-display text-lg font-bold ${accent ? "text-lime" : "text-foreground"}`}>
+    <div className="border-border bg-card rounded-xl border px-3 py-2">
+      <p className="text-muted-foreground text-[10px] tracking-widest">{label.toUpperCase()}</p>
+      <p className={`font-display text-lg font-bold ${accent ? 'text-lime' : 'text-foreground'}`}>
         {value}
       </p>
     </div>

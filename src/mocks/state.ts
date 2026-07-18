@@ -1,15 +1,15 @@
-import type { Prediction } from "@/entities/prediction";
-import type { MatchEventType, TeamInfo } from "@/entities/match";
-import type { Fixture } from "@/entities/fixture";
-import type { WalletActivity, WalletOverview } from "@/entities/wallet";
+import type { Prediction } from '@/entities/prediction';
+import type { MatchEventType, TeamInfo } from '@/entities/match';
+import type { Fixture } from '@/entities/fixture';
+import type { WalletActivity, WalletOverview } from '@/entities/wallet';
 import {
   FIAT_CURRENCY,
   FIAT_RATE,
   MATCH_FULL_MIN,
   MATCH_MIN_PER_SEC,
   STARTING_BALANCE_SOL,
-} from "./config";
-import { seedFromString } from "./prng";
+} from './config';
+import { seedFromString } from './prng';
 
 export interface AddressLedger {
   address: string;
@@ -42,9 +42,9 @@ interface MockState {
   resolutions: Record<string, ResolutionRecord>;
 }
 
-const STORAGE_KEY = "called-it:mock-state";
+const STORAGE_KEY = 'called-it:mock-state';
 
-function freshMatch(nowMs: number): Pick<MockState, "matchSeed" | "matchStartMs"> {
+function freshMatch(nowMs: number): Pick<MockState, 'matchSeed' | 'matchStartMs'> {
   return { matchSeed: seedFromString(`match-${nowMs}`), matchStartMs: nowMs };
 }
 
@@ -96,7 +96,7 @@ export function getLedger(address: string): AddressLedger {
     const now = Date.now();
     ledger = {
       address,
-      handle: address.startsWith("guest") ? "Guest" : "ProPredictor",
+      handle: address.startsWith('guest') ? 'Guest' : 'ProPredictor',
       balanceSol: STARTING_BALANCE_SOL,
       streak: 0,
       bestStreak: 0,
@@ -106,11 +106,11 @@ export function getLedger(address: string): AddressLedger {
       activity: [
         {
           id: `act_${seedFromString(address)}`,
-          type: "deposit",
+          type: 'deposit',
           amountSol: STARTING_BALANCE_SOL,
           fiatAmount: round2(STARTING_BALANCE_SOL * FIAT_RATE),
-          method: "on-ramp",
-          status: "settled",
+          method: 'on-ramp',
+          status: 'settled',
           ts: now,
         },
       ],
@@ -150,37 +150,31 @@ export function deposit(address: string, amountSol: number): WalletOverview {
   ledger.balanceSol = round2(ledger.balanceSol + amountSol);
   ledger.activity.unshift({
     id: `act_${nextSeq()}`,
-    type: "deposit",
+    type: 'deposit',
     amountSol,
     fiatAmount: round2(amountSol * FIAT_RATE),
-    method: "on-ramp",
-    status: "settled",
+    method: 'on-ramp',
+    status: 'settled',
     ts: Date.now(),
   });
   persist();
   return walletOverview(address);
 }
 
-export type WithdrawResult =
-  | { ok: true; wallet: WalletOverview }
-  | { ok: false; error: string };
+export type WithdrawResult = { ok: true; wallet: WalletOverview } | { ok: false; error: string };
 
-export function withdraw(
-  address: string,
-  amountSol: number,
-  method: string,
-): WithdrawResult {
+export function withdraw(address: string, amountSol: number, method: string): WithdrawResult {
   const ledger = getLedger(address);
-  if (amountSol <= 0) return { ok: false, error: "Amount must be positive" };
-  if (amountSol > ledger.balanceSol) return { ok: false, error: "Insufficient balance" };
+  if (amountSol <= 0) return { ok: false, error: 'Amount must be positive' };
+  if (amountSol > ledger.balanceSol) return { ok: false, error: 'Insufficient balance' };
   ledger.balanceSol = round2(ledger.balanceSol - amountSol);
   ledger.activity.unshift({
     id: `act_${nextSeq()}`,
-    type: "withdraw",
+    type: 'withdraw',
     amountSol,
     fiatAmount: round2(amountSol * FIAT_RATE),
     method,
-    status: "pending", // off-ramp settles to the bank shortly after
+    status: 'pending', // off-ramp settles to the bank shortly after
     ts: Date.now(),
   });
   persist();
@@ -207,12 +201,42 @@ export function allLedgers(): AddressLedger[] {
 const T = (code: string, name: string, flag: string): TeamInfo => ({ code, name, flag });
 
 /** Next World Cup knockout fixtures — kickoff derived from now so the list stays "upcoming". */
-const FIXTURE_PLAN: Array<Omit<Fixture, "id" | "kickoff"> & { offsetHours: number }> = [
-  { home: T("BRA", "Brazil", "🇧🇷"), away: T("FRA", "France", "🇫🇷"), stage: "Semi-final", venue: "MetLife Stadium", offsetHours: 5 },
-  { home: T("ARG", "Argentina", "🇦🇷"), away: T("ESP", "Spain", "🇪🇸"), stage: "Semi-final", venue: "SoFi Stadium", offsetHours: 29 },
-  { home: T("POR", "Portugal", "🇵🇹"), away: T("NED", "Netherlands", "🇳🇱"), stage: "Third place", venue: "AT&T Stadium", offsetHours: 51 },
-  { home: T("BRA", "Brazil", "🇧🇷"), away: T("ARG", "Argentina", "🇦🇷"), stage: "Final", venue: "Estadio Azteca", offsetHours: 75 },
-  { home: T("GER", "Germany", "🇩🇪"), away: T("MEX", "Mexico", "🇲🇽"), stage: "Friendly", venue: "Mercedes-Benz Stadium", offsetHours: 99 },
+const FIXTURE_PLAN: Array<Omit<Fixture, 'id' | 'kickoff'> & { offsetHours: number }> = [
+  {
+    home: T('BRA', 'Brazil', '🇧🇷'),
+    away: T('FRA', 'France', '🇫🇷'),
+    stage: 'Semi-final',
+    venue: 'MetLife Stadium',
+    offsetHours: 5,
+  },
+  {
+    home: T('ARG', 'Argentina', '🇦🇷'),
+    away: T('ESP', 'Spain', '🇪🇸'),
+    stage: 'Semi-final',
+    venue: 'SoFi Stadium',
+    offsetHours: 29,
+  },
+  {
+    home: T('POR', 'Portugal', '🇵🇹'),
+    away: T('NED', 'Netherlands', '🇳🇱'),
+    stage: 'Third place',
+    venue: 'AT&T Stadium',
+    offsetHours: 51,
+  },
+  {
+    home: T('BRA', 'Brazil', '🇧🇷'),
+    away: T('ARG', 'Argentina', '🇦🇷'),
+    stage: 'Final',
+    venue: 'Estadio Azteca',
+    offsetHours: 75,
+  },
+  {
+    home: T('GER', 'Germany', '🇩🇪'),
+    away: T('MEX', 'Mexico', '🇲🇽'),
+    stage: 'Friendly',
+    venue: 'Mercedes-Benz Stadium',
+    offsetHours: 99,
+  },
 ];
 
 export function upcomingFixtures(): Fixture[] {

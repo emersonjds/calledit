@@ -12,14 +12,14 @@
 The typed client (`src/shared/api/client.ts`) calls six seams, Zod-validated against
 `schemas.ts`. MSW mocks them today; the real backend must serve the **same shapes**:
 
-| Frontend call | Method + path | Zod shape it must return |
-| --- | --- | --- |
-| `connectWallet` | `POST /api/wallet/connect` | `WalletAccount { address, balanceSol, chain, provider }` |
-| `getFeed` | `GET /api/feed/:matchId` | `MatchSnapshot { matchId, clockMin, period, home, away, score:[n,n], pct{home,draw,away}, events[], markets[], live }` |
-| `commitPrediction` | `POST /api/predictions` | `Prediction { id, matchId, market, provable, stakeSol, multiplier, potentialSol, atClockMin, windowMin, status, stamp{txHash,stampedAt,seq,epochDay}, settlement? }` |
-| `getPrediction` | `GET /api/predictions/:id` | same `Prediction` (poll until `status` = `won`/`lost` with `settlement`) |
-| `getProfile` | `GET /api/me?address=` | `ProfileDto { address, handle, accuracy, totalCalls, wonCalls, bestStreak, currentStreak, rank, balanceSol }` |
-| `getLeaderboard` | `GET /api/leaderboard?address=` | `LeaderboardDto { entries[{rank,handle,accuracy,streak,calls,you}] }` |
+| Frontend call      | Method + path                   | Zod shape it must return                                                                                                                                             |
+| ------------------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `connectWallet`    | `POST /api/wallet/connect`      | `WalletAccount { address, balanceSol, chain, provider }`                                                                                                             |
+| `getFeed`          | `GET /api/feed/:matchId`        | `MatchSnapshot { matchId, clockMin, period, home, away, score:[n,n], pct{home,draw,away}, events[], markets[], live }`                                               |
+| `commitPrediction` | `POST /api/predictions`         | `Prediction { id, matchId, market, provable, stakeSol, multiplier, potentialSol, atClockMin, windowMin, status, stamp{txHash,stampedAt,seq,epochDay}, settlement? }` |
+| `getPrediction`    | `GET /api/predictions/:id`      | same `Prediction` (poll until `status` = `won`/`lost` with `settlement`)                                                                                             |
+| `getProfile`       | `GET /api/me?address=`          | `ProfileDto { address, handle, accuracy, totalCalls, wonCalls, bestStreak, currentStreak, rank, balanceSol }`                                                        |
+| `getLeaderboard`   | `GET /api/leaderboard?address=` | `LeaderboardDto { entries[{rank,handle,accuracy,streak,calls,you}] }`                                                                                                |
 
 Hard constraints baked into the schemas: `stamp.seq >= 1` (int), `epochDay` int, `provable`
 gates settlement. The backend must **honor** them — they mirror TxLINE traps #4 and the provability model.
@@ -29,7 +29,9 @@ gates settlement. The backend must **honor** them — they mirror TxLINE traps #
 ## 2. Backend components to build
 
 ### (a) Wallet + subscription bootstrap
+
 One-time (per network) setup that gets the service running.
+
 - Get/hold a service wallet with **SOL** (devnet: airdrop; mainnet: fund).
 - `subscribe(SL 12, 4 weeks)` on-chain via `txoracle` (Token-2022 ATAs, PDAs `token_treasury_v2` /
   `pricing_matrix`).
@@ -37,13 +39,15 @@ One-time (per network) setup that gets the service running.
 - Serves `POST /api/wallet/connect` for the user's own wallet connect (Phantom pubkey + SOL balance
   from RPC).
 
-### (b) TxLINE feed ingester / recorder  — **respects trap #2, build TODAY**
+### (b) TxLINE feed ingester / recorder — **respects trap #2, build TODAY**
+
 - Open **SSE** to `/scores/stream` and `/odds/stream` (both auth headers, Node 20+).
 - **Persist every raw event to disk** append-only (jsonl/db), keyed by `fixtureId` + `seq` + `ts`.
   History endpoints are too short to reconstruct later — the recorder is the system of record.
 - Auto-reconnect; on 401 renew JWT and resume.
 
 ### (c) Match-state projector
+
 - Fold recorded score events into the app's `MatchSnapshot`: `clockMin`, `period`, `score`,
   `events[]` (map `SoccerData` action/goal/card/corner → `MatchEvent`), `pct` from the odds `Pct`
   array (house margin already removed), `markets[]` **discovered from the payload** (no hardcoded
@@ -51,6 +55,7 @@ One-time (per network) setup that gets the service running.
 - Serves `GET /api/feed/:matchId`.
 
 ### (d) Settlement service — **the prize feature**
+
 - On prediction resolution: `GET /api/scores/stat-validation-v3?fixtureId=&seq=&statKeys=` using the
   provable keys for the market × period (`periodKey(period, baseKey)` from `entities/match/periods.ts`).
 - Submit a **real CPI** into `txoracle` `validate_stat` (verify the exact instruction from the IDL) —
@@ -61,12 +66,14 @@ One-time (per network) setup that gets the service running.
 - Serves `GET /api/predictions/:id` (returns `settlement` once resolved) and backs `POST /api/predictions`.
 
 ### (e) Escrow / pot mechanism
+
 - Hold stakes and pay winners from the `validate_stat` boolean.
 - **Regulatory caveat (flag to Emerson):** real-money escrow needs licensing. For the hackathon ship
   **free-to-play / points, or a sponsor/points pool** (ideas doc: cards & corners free-to-play sidesteps
   regulation entirely). Real-money is post-hackathon and out of scope.
 
 ### (f) Credential lifecycle / refresh
+
 - 401 → renew JWT (same host), retry with same API token. 403 → assert message/wallet/signature/network/host.
 - Never log or commit JWT/apiToken/keys.
 
@@ -74,14 +81,14 @@ One-time (per network) setup that gets the service running.
 
 ## 3. Day-by-day plan (mirrors the ideas doc "order of attack")
 
-| When | Deliver |
-| --- | --- |
-| **TODAY (non-negotiable)** | Service wallet + SOL → `subscribe` **SL 12** → activate token → **feed recorder running to disk**. Nothing else starts until this runs. |
-| **Day 1** | **De-risk the CPI before building on it:** a minimal Anchor call that does a real CPI into `txoracle` `validate_stat` and reads the returned boolean. If it works, the project stands. If not, discover it now, not on day 6. |
-| **Days 2–3** | Pot contract: deposit → predict → **settlement via CPI** → payout. One match, one pot, no frills. |
-| **Days 4–5** | Wire the real backend behind the six frontend seams (swap MSW). Match-state projector + prediction/settlement endpoints. |
-| **Day 6** | Run against a **real live match** with real people. Find what breaks. |
-| **Day 7** | Demo video (eliminatory requirement). Reserve the whole day. |
+| When                       | Deliver                                                                                                                                                                                                                       |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **TODAY (non-negotiable)** | Service wallet + SOL → `subscribe` **SL 12** → activate token → **feed recorder running to disk**. Nothing else starts until this runs.                                                                                       |
+| **Day 1**                  | **De-risk the CPI before building on it:** a minimal Anchor call that does a real CPI into `txoracle` `validate_stat` and reads the returned boolean. If it works, the project stands. If not, discover it now, not on day 6. |
+| **Days 2–3**               | Pot contract: deposit → predict → **settlement via CPI** → payout. One match, one pot, no frills.                                                                                                                             |
+| **Days 4–5**               | Wire the real backend behind the six frontend seams (swap MSW). Match-state projector + prediction/settlement endpoints.                                                                                                      |
+| **Day 6**                  | Run against a **real live match** with real people. Find what breaks.                                                                                                                                                         |
+| **Day 7**                  | Demo video (eliminatory requirement). Reserve the whole day.                                                                                                                                                                  |
 
 **The two things that are TODAY:** the feed recorder must be running (live matches vanish with the
 World Cup) and the CPI must be proven on day 1. Everything else can slip; these can't.

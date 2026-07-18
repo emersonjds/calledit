@@ -1,4 +1,4 @@
-export type ChainKind = "solana" | "evm";
+export type ChainKind = 'solana' | 'evm';
 
 export interface WalletAccount {
   address: string;
@@ -9,7 +9,7 @@ export interface WalletAccount {
 
 /** A network operation to sign — the seam a real adapter turns into a Solana tx / EVM tx. */
 export interface TxIntent {
-  kind: "commit-prediction" | "claim-payout";
+  kind: 'commit-prediction' | 'claim-payout';
   payload: Record<string, unknown>;
 }
 
@@ -31,7 +31,7 @@ export interface WalletAdapter {
   signAndSend(intent: TxIntent): Promise<SignResult>;
 }
 
-export type ActivityType = "deposit" | "withdraw" | "payout" | "stake";
+export type ActivityType = 'deposit' | 'withdraw' | 'payout' | 'stake';
 
 export interface WalletActivity {
   id: string;
@@ -39,7 +39,7 @@ export interface WalletActivity {
   amountSol: number;
   fiatAmount?: number;
   method?: string; // "PIX", "settlement", "on-ramp"
-  status: "settled" | "pending";
+  status: 'settled' | 'pending';
   ts: number;
 }
 

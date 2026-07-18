@@ -29,8 +29,14 @@ export function CountdownRing({ seconds, total, label }: CountdownRingProps) {
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="font-mono text-2xl font-bold text-foreground">{Math.max(0, Math.ceil(seconds))}</span>
-        {label && <span className="text-[10px] font-semibold tracking-wide text-muted-foreground">{label}</span>}
+        <span className="text-foreground font-mono text-2xl font-bold">
+          {Math.max(0, Math.ceil(seconds))}
+        </span>
+        {label && (
+          <span className="text-muted-foreground text-[10px] font-semibold tracking-wide">
+            {label}
+          </span>
+        )}
       </div>
     </div>
   );

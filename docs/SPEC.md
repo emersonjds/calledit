@@ -19,30 +19,30 @@ This is the one design where removing the on-chain layer breaks the product. Tha
 
 TxLINE delivers **two very different layers**. Confusing them is what kills projects on demo day.
 
-| Layer | Content | Settleable on-chain? |
-| --- | --- | --- |
-| **Rich (feed)** | goal author, minute, VAR, foul type, shot, substitution, lineups, `Pct` win-probability | ❌ No Merkle proof — **UI / narration only** |
-| **Provable (Merkle)** | 8 statistics only: goals, yellow cards, red cards, corners — **per team, per period** | ✅ Proven by `validate_stat_v2` |
+| Layer                 | Content                                                                                 | Settleable on-chain?                         |
+| --------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------- |
+| **Rich (feed)**       | goal author, minute, VAR, foul type, shot, substitution, lineups, `Pct` win-probability | ❌ No Merkle proof — **UI / narration only** |
+| **Provable (Merkle)** | 8 statistics only: goals, yellow cards, red cards, corners — **per team, per period**   | ✅ Proven by `validate_stat_v2`              |
 
 **The 8 provable keys** (period prefix: `0` total · `1000` 1st half · `3000` 2nd half · `4000/5000` extra time · `6000` penalty shootout · `7000` extra-time total):
 
-| Key | Stat |
-| --- | --- |
+| Key   | Stat                    |
+| ----- | ----------------------- |
 | 1 / 2 | Goals — team 1 / team 2 |
-| 3 / 4 | Yellow cards |
-| 5 / 6 | Red cards |
-| 7 / 8 | Corners |
+| 3 / 4 | Yellow cards            |
+| 5 / 6 | Red cards               |
+| 7 / 8 | Corners                 |
 
 **Golden rule: prove the result, narrate the rest.** Anything involving money/points settles against the 8 keys. Anything using minute/player/possession is UI only.
 
 ### Market → provability mapping (used by the app)
 
-| UI market (design) | Backed by | On-chain provable? |
-| --- | --- | --- |
-| **Goal** | keys 1/2 | ✅ |
-| **Card** | keys 3–6 | ✅ |
-| **Corner** | keys 7/8 | ✅ |
-| **Foul** | rich feed only | ❌ — mocked in MSW, flagged `provable: false`; in production it stays a for-fun (points-only, no-settlement) market |
+| UI market (design) | Backed by      | On-chain provable?                                                                                                  |
+| ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Goal**           | keys 1/2       | ✅                                                                                                                  |
+| **Card**           | keys 3–6       | ✅                                                                                                                  |
+| **Corner**         | keys 7/8       | ✅                                                                                                                  |
+| **Foul**           | rich feed only | ❌ — mocked in MSW, flagged `provable: false`; in production it stays a for-fun (points-only, no-settlement) market |
 
 The prediction type carries a `provable` flag so the real-integration layer knows which ones route to a Solana CPI and which stay off-chain fun.
 
@@ -94,9 +94,9 @@ Prediction resolution is **deterministic**: MSW owns the match timeline (scripte
 
 Two simulated systems, mapped 1:1 to what they become in production:
 
-| Mock (now) | Production (later, docs pending) |
-| --- | --- |
-| **Match engine** — deterministic timeline in MSW, served via `GET /api/feed` | **TxLINE feed** — real SSE stream, Service Level **12** (not 1 — SL1 is 60 s late) |
+| Mock (now)                                                                                            | Production (later, docs pending)                                                        |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Match engine** — deterministic timeline in MSW, served via `GET /api/feed`                          | **TxLINE feed** — real SSE stream, Service Level **12** (not 1 — SL1 is 60 s late)      |
 | **On-chain sim** — `POST /api/predictions` stamps a fake tx/seq/epochDay; settle returns a fake proof | **Solana program** `validate_stat_v2` CPI — real Merkle settlement, geometric predicate |
 
 Time is **compressed** (configurable, default ~30×) so a full match plays in ~3 min for the demo.
@@ -108,6 +108,7 @@ Time is **compressed** (configurable, default ~30×) so a full match plays in ~3
 Program IDs — mainnet `9ExbZjAapQww1vfcisDmrngPinHTEfpjYRWMunJgcKaA` · devnet `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J`. IDL `txoracle` v1.5.5/1.5.6. OpenAPI: `txline.txodds.com/docs/docs.yaml`.
 
 The five traps (must not be violated in production):
+
 1. **Service Level 1 is 60 s delayed** — subscribe to **SL 12** for real-time.
 2. **History covers only ~2 weeks and not the last 6 h** — record the feed to disk from day one.
 3. **No market catalog** — never hardcode that a market exists; discover from the payload at runtime.

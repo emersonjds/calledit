@@ -33,7 +33,7 @@ Golden rules for all AI-assisted development in this repo. Read fully before any
 
 ## 4. Code quality
 
-- **Comments: only the strictly necessary.** Comment the non-obvious *why* of a rule (money, chain constraint, security, timing trap). No comment that narrates what the code already says.
+- **Comments: only the strictly necessary.** Comment the non-obvious _why_ of a rule (money, chain constraint, security, timing trap). No comment that narrates what the code already says.
 - **Readable in ≤10s** by any level. Small single-purpose functions, clear names, no needless cleverness.
 - **Best pattern = simplest that solves it well.** No premature abstraction, no dead code.
 - **Performance always on the radar**: no wasteful re-render/recompute/redundant query; structures that scale — but measure before complicating.
@@ -84,7 +84,7 @@ Domain specialists: `arq` (web3/on-chain architecture, performance), `back` (Sol
 ## 10. Domain glossary
 
 - **Call / prediction**: a stake on a market (`goal|card|corner|foul`) committed before the event.
-- **Stamp**: on-chain commitment (tx hash, timestamp, `seq`, `epochDay`) proving *when* the call was made.
+- **Stamp**: on-chain commitment (tx hash, timestamp, `seq`, `epochDay`) proving _when_ the call was made.
 - **Settlement**: the geometric "who called it first / closest" predicate (`validate_stat_v2`) run against the TxLINE Merkle result.
 - **Streak / multiplier**: consecutive wins raise the payout multiplier (3→1.5×, 5→2×…); a loss resets it.
 - **Provable market**: one backed by the 8 TxLINE keys (goals/cards/corners). `foul` is not provable.
