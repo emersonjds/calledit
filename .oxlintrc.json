@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "react/react-in-jsx-scope": "off"
+  },
+  "ignorePatterns": ["dist", "out", "dev-dist", "coverage", "public/mockServiceWorker.js"],
+  "overrides": [
+    {
+      "files": ["src/shared/ui/**"],
+      "rules": {
+        "no-shadow": "off",
+        "no-underscore-dangle": "off",
+        "react/no-unstable-nested-components": "off"
+      }
+    }
+  ]
+}
