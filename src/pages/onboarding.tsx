@@ -8,7 +8,7 @@ export function OnboardingPage() {
   const connect = useConnectWallet();
 
   const enter = (provider: string) =>
-    connect.mutate(provider, { onSuccess: () => navigate('/', { replace: true }) });
+    connect.mutate({ provider }, { onSuccess: () => navigate('/', { replace: true }) });
 
   return (
     <div className="bg-background flex min-h-dvh w-full max-w-[430px] flex-col items-center justify-between px-6 py-14 text-center">

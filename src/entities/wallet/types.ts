@@ -4,7 +4,7 @@ export interface WalletAccount {
   address: string;
   balanceSol: number;
   chain: ChainKind;
-  provider: string; // "phantom" | "metamask" | "guest"
+  provider: string; // "phantom" | "metamask" | "google" | "solana" | "guest"
 }
 
 /** A network operation to sign — the seam a real adapter turns into a Solana tx / EVM tx. */

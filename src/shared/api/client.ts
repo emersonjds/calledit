@@ -38,10 +38,10 @@ export interface CommitPredictionInput {
 }
 
 export const api = {
-  connectWallet(provider: string): Promise<WalletAccount> {
+  connectWallet(provider: string, address?: string): Promise<WalletAccount> {
     return request('/wallet/connect', walletAccountSchema, {
       method: 'POST',
-      body: JSON.stringify({ provider }),
+      body: JSON.stringify({ provider, address }),
     }) as Promise<WalletAccount>;
   },
 

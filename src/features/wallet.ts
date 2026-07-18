@@ -3,11 +3,12 @@ import type { WalletOverview } from '@/entities/wallet';
 import { api } from '@/shared/api';
 import { useSession } from '@/store/session';
 
-/** Connect a wallet provider (Phantom / MetaMask / guest) through the adapter seam. */
+/** Connect a wallet provider through the adapter seam. `address` is set for app-created/embedded wallets. */
 export function useConnectWallet() {
   const connect = useSession((state) => state.connect);
   return useMutation({
-    mutationFn: (provider: string) => api.connectWallet(provider),
+    mutationFn: ({ provider, address }: { provider: string; address?: string }) =>
+      api.connectWallet(provider, address),
     onSuccess: (account) => connect(account),
   });
 }
