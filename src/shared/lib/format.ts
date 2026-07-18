@@ -25,3 +25,25 @@ export function formatTimeOfDay(ms: number): string {
 export function formatMultiplier(value: number): string {
   return `${value}x`;
 }
+
+export function formatFiat(amount: number, currency: string): string {
+  return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+}
+
+export function formatKickoff(kickoffMs: number): string {
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(kickoffMs));
+}
+
+/** "in 5h" / "in 2d" until a future timestamp. */
+export function formatCountdown(targetMs: number, nowMs: number): string {
+  const diffMin = Math.max(0, Math.round((targetMs - nowMs) / 60_000));
+  if (diffMin < 60) return `in ${diffMin}m`;
+  if (diffMin < 1440) return `in ${Math.round(diffMin / 60)}h`;
+  return `in ${Math.round(diffMin / 1440)}d`;
+}

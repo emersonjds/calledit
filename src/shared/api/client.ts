@@ -1,13 +1,16 @@
 import type { MatchSnapshot } from "@/entities/match";
 import type { MarketId, Prediction } from "@/entities/prediction";
-import type { WalletAccount } from "@/entities/wallet";
+import type { WalletAccount, WalletOverview } from "@/entities/wallet";
+import type { Fixture } from "@/entities/fixture";
 import {
+  fixturesSchema,
   historySchema,
   leaderboardSchema,
   matchSnapshotSchema,
   predictionSchema,
   profileSchema,
   walletAccountSchema,
+  walletOverviewSchema,
   type LeaderboardDto,
   type ProfileDto,
 } from "./schemas";
@@ -82,6 +85,33 @@ export const api = {
     return request(
       `/leaderboard?address=${encodeURIComponent(address)}`,
       leaderboardSchema,
+    );
+  },
+
+  getWallet(address: string): Promise<WalletOverview> {
+    return request(
+      `/wallet?address=${encodeURIComponent(address)}`,
+      walletOverviewSchema,
+    ) as Promise<WalletOverview>;
+  },
+
+  deposit(address: string, amountSol: number): Promise<WalletOverview> {
+    return request("/wallet/deposit", walletOverviewSchema, {
+      method: "POST",
+      body: JSON.stringify({ address, amountSol }),
+    }) as Promise<WalletOverview>;
+  },
+
+  withdraw(address: string, amountSol: number, method: string): Promise<WalletOverview> {
+    return request("/wallet/withdraw", walletOverviewSchema, {
+      method: "POST",
+      body: JSON.stringify({ address, amountSol, method }),
+    }) as Promise<WalletOverview>;
+  },
+
+  getUpcomingFixtures(): Promise<Fixture[]> {
+    return request("/fixtures/upcoming", fixturesSchema).then(
+      (result) => result.items as Fixture[],
     );
   },
 };

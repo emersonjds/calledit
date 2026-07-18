@@ -70,6 +70,37 @@ export const historySchema = z.object({
   items: z.array(predictionSchema),
 });
 
+export const walletActivitySchema = z.object({
+  id: z.string(),
+  type: z.enum(["deposit", "withdraw", "payout", "stake"]),
+  amountSol: z.number(),
+  fiatAmount: z.number().optional(),
+  method: z.string().optional(),
+  status: z.enum(["settled", "pending"]),
+  ts: z.number(),
+});
+
+export const walletOverviewSchema = z.object({
+  address: z.string(),
+  balanceSol: z.number(),
+  currency: z.string(),
+  fiatRate: z.number(),
+  activity: z.array(walletActivitySchema),
+});
+
+export const fixtureSchema = z.object({
+  id: z.string(),
+  home: teamInfoSchema,
+  away: teamInfoSchema,
+  kickoff: z.number(),
+  stage: z.string(),
+  venue: z.string(),
+});
+
+export const fixturesSchema = z.object({
+  items: z.array(fixtureSchema),
+});
+
 export const profileSchema = z.object({
   address: z.string(),
   handle: z.string(),
