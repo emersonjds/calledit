@@ -117,6 +117,10 @@ export function getLedger(address: string): AddressLedger {
     };
     state.ledgers[address] = ledger;
     persist();
+  } else if (!ledger.activity) {
+    // Backfill ledgers persisted before the wallet activity field existed.
+    ledger.activity = [];
+    persist();
   }
   return ledger;
 }
