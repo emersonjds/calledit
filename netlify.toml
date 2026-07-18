@@ -1,0 +1,14 @@
+# Netlify config. For drag-and-drop: just drop the /out folder — the _redirects
+# file inside it already handles SPA routing. This file is for git-connected deploys.
+[build]
+  command = "pnpm build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback so deep links (/wallet, /matches, …) resolve to the app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
