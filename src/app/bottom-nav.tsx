@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { History, House, User } from "lucide-react";
+import { CalendarDays, History, House, User } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 const TABS = [
   { to: "/", label: "Home", icon: House, end: true },
+  { to: "/matches", label: "Matches", icon: CalendarDays, end: false },
   { to: "/history", label: "History", icon: History, end: false },
   { to: "/profile", label: "Profile", icon: User, end: false },
 ];

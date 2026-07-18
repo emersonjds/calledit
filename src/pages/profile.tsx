@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ShieldCheck, Trophy } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import { Switch } from "@/shared/ui/switch";
 import { Button } from "@/shared/ui/button";
 import { shortAddress } from "@/shared/lib/format";
@@ -19,6 +19,7 @@ export function ProfilePage() {
     <div className="space-y-4 px-4 py-4">
       <div className="flex items-center gap-3">
         <Avatar className="size-14 border-2 border-lime">
+          <AvatarImage src="https://i.pravatar.cc/150?img=68" alt={me?.handle ?? "You"} />
           <AvatarFallback className="bg-card font-display text-lg text-lime">
             {me?.handle.slice(0, 2).toUpperCase() ?? "··"}
           </AvatarFallback>

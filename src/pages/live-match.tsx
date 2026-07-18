@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { Zap } from "lucide-react";
+import { Wallet, Zap } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 import {
@@ -51,9 +52,13 @@ export function LiveMatchPage() {
         <span className="font-display text-lg font-extrabold tracking-tight text-lime">
           CALLED IT
         </span>
-        <span className="rounded-full border border-border bg-card px-3 py-1 font-mono text-xs text-foreground">
+        <Link
+          to="/wallet"
+          className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 font-mono text-xs text-foreground transition-colors hover:border-lime"
+        >
+          <Wallet className="size-3.5 text-lime" />
           {formatSol(balance)}
-        </span>
+        </Link>
       </div>
 
       {feed.isLoading || !feed.data ? (
