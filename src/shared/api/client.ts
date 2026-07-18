@@ -2,6 +2,7 @@ import type { MatchSnapshot } from "@/entities/match";
 import type { MarketId, Prediction } from "@/entities/prediction";
 import type { WalletAccount } from "@/entities/wallet";
 import {
+  historySchema,
   leaderboardSchema,
   matchSnapshotSchema,
   predictionSchema,
@@ -34,7 +35,6 @@ export interface CommitPredictionInput {
   matchId: string;
   market: MarketId;
   stakeSol: number;
-  atClockMin: number;
   address: string;
 }
 
@@ -65,6 +65,13 @@ export const api = {
       `/predictions/${id}`,
       predictionSchema,
     ) as Promise<Prediction>;
+  },
+
+  getHistory(address: string): Promise<Prediction[]> {
+    return request(
+      `/predictions?address=${encodeURIComponent(address)}`,
+      historySchema,
+    ).then((result) => result.items as Prediction[]);
   },
 
   getProfile(address: string): Promise<ProfileDto> {

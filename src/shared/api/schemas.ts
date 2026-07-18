@@ -66,6 +66,10 @@ export const predictionSchema = z.object({
   settlement: settlementSchema.optional(),
 });
 
+export const historySchema = z.object({
+  items: z.array(predictionSchema),
+});
+
 export const profileSchema = z.object({
   address: z.string(),
   handle: z.string(),
