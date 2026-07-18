@@ -4,4 +4,7 @@ export type {
   TxIntent,
   SignResult,
   WalletAdapter,
+  ActivityType,
+  WalletActivity,
+  WalletOverview,
 } from "./types";

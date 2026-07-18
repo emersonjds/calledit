@@ -30,3 +30,24 @@ export interface WalletAdapter {
   connect(): Promise<WalletAccount>;
   signAndSend(intent: TxIntent): Promise<SignResult>;
 }
+
+export type ActivityType = "deposit" | "withdraw" | "payout" | "stake";
+
+export interface WalletActivity {
+  id: string;
+  type: ActivityType;
+  amountSol: number;
+  fiatAmount?: number;
+  method?: string; // "PIX", "settlement", "on-ramp"
+  status: "settled" | "pending";
+  ts: number;
+}
+
+/** Wallet overview: balance plus the on/off-ramp view (SOL ↔ local fiat). */
+export interface WalletOverview {
+  address: string;
+  balanceSol: number;
+  currency: string; // ISO code, e.g. "BRL"
+  fiatRate: number; // local fiat per 1 SOL
+  activity: WalletActivity[];
+}
