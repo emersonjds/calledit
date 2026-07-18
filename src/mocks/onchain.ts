@@ -95,6 +95,14 @@ export function commit({ matchId, market, stakeSol, address }: CommitInput): Com
   ledger.balanceSol = Math.round((ledger.balanceSol - stakeSol) * 100) / 100;
   ledger.totalCalls += 1;
   ledger.predictions.unshift(prediction);
+  ledger.activity.unshift({
+    id: `act_${prediction.stamp.seq}`,
+    type: "stake",
+    amountSol: stakeSol,
+    method: `${def.label} call`,
+    status: "settled",
+    ts: stampedAt,
+  });
 
   saveResolution({
     id: prediction.id,
@@ -133,6 +141,14 @@ export function getPrediction(id: string): Prediction | null {
     ledger.streak += 1;
     ledger.bestStreak = Math.max(ledger.bestStreak, ledger.streak);
     ledger.wonCalls += 1;
+    ledger.activity.unshift({
+      id: `act_${base58(6)}`,
+      type: "payout",
+      amountSol: prediction.potentialSol,
+      method: "settlement",
+      status: "settled",
+      ts: Date.now(),
+    });
   } else {
     prediction.status = "lost";
     ledger.streak = 0;

@@ -1,6 +1,14 @@
 import type { Prediction } from "@/entities/prediction";
-import type { MatchEventType } from "@/entities/match";
-import { MATCH_FULL_MIN, MATCH_MIN_PER_SEC, STARTING_BALANCE_SOL } from "./config";
+import type { MatchEventType, TeamInfo } from "@/entities/match";
+import type { Fixture } from "@/entities/fixture";
+import type { WalletActivity, WalletOverview } from "@/entities/wallet";
+import {
+  FIAT_CURRENCY,
+  FIAT_RATE,
+  MATCH_FULL_MIN,
+  MATCH_MIN_PER_SEC,
+  STARTING_BALANCE_SOL,
+} from "./config";
 import { seedFromString } from "./prng";
 
 export interface AddressLedger {
@@ -12,6 +20,7 @@ export interface AddressLedger {
   wonCalls: number;
   totalCalls: number;
   predictions: Prediction[]; // newest first
+  activity: WalletActivity[]; // wallet ledger, newest first
 }
 
 /** Private settlement record — never returned to the client, keeps settle deterministic. */
@@ -84,6 +93,7 @@ export function nextSeq(): number {
 export function getLedger(address: string): AddressLedger {
   let ledger = state.ledgers[address];
   if (!ledger) {
+    const now = Date.now();
     ledger = {
       address,
       handle: address.startsWith("guest") ? "Guest" : "ProPredictor",
@@ -93,11 +103,84 @@ export function getLedger(address: string): AddressLedger {
       wonCalls: 0,
       totalCalls: 0,
       predictions: [],
+      activity: [
+        {
+          id: `act_${seedFromString(address)}`,
+          type: "deposit",
+          amountSol: STARTING_BALANCE_SOL,
+          fiatAmount: round2(STARTING_BALANCE_SOL * FIAT_RATE),
+          method: "on-ramp",
+          status: "settled",
+          ts: now,
+        },
+      ],
     };
     state.ledgers[address] = ledger;
     persist();
   }
   return ledger;
+}
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function pushActivity(address: string, activity: WalletActivity): void {
+  getLedger(address).activity.unshift(activity);
+  persist();
+}
+
+export function walletOverview(address: string): WalletOverview {
+  const ledger = getLedger(address);
+  return {
+    address,
+    balanceSol: ledger.balanceSol,
+    currency: FIAT_CURRENCY,
+    fiatRate: FIAT_RATE,
+    activity: ledger.activity.slice(0, 30),
+  };
+}
+
+export function deposit(address: string, amountSol: number): WalletOverview {
+  const ledger = getLedger(address);
+  ledger.balanceSol = round2(ledger.balanceSol + amountSol);
+  ledger.activity.unshift({
+    id: `act_${nextSeq()}`,
+    type: "deposit",
+    amountSol,
+    fiatAmount: round2(amountSol * FIAT_RATE),
+    method: "on-ramp",
+    status: "settled",
+    ts: Date.now(),
+  });
+  persist();
+  return walletOverview(address);
+}
+
+export type WithdrawResult =
+  | { ok: true; wallet: WalletOverview }
+  | { ok: false; error: string };
+
+export function withdraw(
+  address: string,
+  amountSol: number,
+  method: string,
+): WithdrawResult {
+  const ledger = getLedger(address);
+  if (amountSol <= 0) return { ok: false, error: "Amount must be positive" };
+  if (amountSol > ledger.balanceSol) return { ok: false, error: "Insufficient balance" };
+  ledger.balanceSol = round2(ledger.balanceSol - amountSol);
+  ledger.activity.unshift({
+    id: `act_${nextSeq()}`,
+    type: "withdraw",
+    amountSol,
+    fiatAmount: round2(amountSol * FIAT_RATE),
+    method,
+    status: "pending", // off-ramp settles to the bank shortly after
+    ts: Date.now(),
+  });
+  persist();
+  return { ok: true, wallet: walletOverview(address) };
 }
 
 export function saveResolution(record: ResolutionRecord): void {
@@ -115,4 +198,27 @@ export function commitPersist(): void {
 
 export function allLedgers(): AddressLedger[] {
   return Object.values(state.ledgers);
+}
+
+const T = (code: string, name: string, flag: string): TeamInfo => ({ code, name, flag });
+
+/** Next World Cup knockout fixtures — kickoff derived from now so the list stays "upcoming". */
+const FIXTURE_PLAN: Array<Omit<Fixture, "id" | "kickoff"> & { offsetHours: number }> = [
+  { home: T("BRA", "Brazil", "🇧🇷"), away: T("FRA", "France", "🇫🇷"), stage: "Semi-final", venue: "MetLife Stadium", offsetHours: 5 },
+  { home: T("ARG", "Argentina", "🇦🇷"), away: T("ESP", "Spain", "🇪🇸"), stage: "Semi-final", venue: "SoFi Stadium", offsetHours: 29 },
+  { home: T("POR", "Portugal", "🇵🇹"), away: T("NED", "Netherlands", "🇳🇱"), stage: "Third place", venue: "AT&T Stadium", offsetHours: 51 },
+  { home: T("BRA", "Brazil", "🇧🇷"), away: T("ARG", "Argentina", "🇦🇷"), stage: "Final", venue: "Estadio Azteca", offsetHours: 75 },
+  { home: T("GER", "Germany", "🇩🇪"), away: T("MEX", "Mexico", "🇲🇽"), stage: "Friendly", venue: "Mercedes-Benz Stadium", offsetHours: 99 },
+];
+
+export function upcomingFixtures(): Fixture[] {
+  const now = Date.now();
+  return FIXTURE_PLAN.map((plan, index) => ({
+    id: `fx-${index}`,
+    home: plan.home,
+    away: plan.away,
+    stage: plan.stage,
+    venue: plan.venue,
+    kickoff: now + plan.offsetHours * 3_600_000,
+  }));
 }

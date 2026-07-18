@@ -2,7 +2,14 @@ import { http, HttpResponse, delay } from "msw";
 import { isMarketId } from "@/entities/prediction";
 import type { WalletAccount, ChainKind } from "@/entities/wallet";
 import { snapshotAt } from "./match-engine";
-import { getLedger, getMatch } from "./state";
+import {
+  deposit,
+  getLedger,
+  getMatch,
+  upcomingFixtures,
+  walletOverview,
+  withdraw,
+} from "./state";
 import { commit, getPrediction, leaderboard, profile } from "./onchain";
 import { mulberry32, seedFromString } from "./prng";
 
@@ -80,5 +87,35 @@ export const handlers = [
   http.get("/api/leaderboard", ({ request }) => {
     const address = new URL(request.url).searchParams.get("address") ?? "";
     return HttpResponse.json(leaderboard(address));
+  }),
+
+  http.get("/api/wallet", ({ request }) => {
+    const address = new URL(request.url).searchParams.get("address");
+    if (!address) return HttpResponse.text("address required", { status: 400 });
+    return HttpResponse.json(walletOverview(address));
+  }),
+
+  http.post("/api/wallet/deposit", async ({ request }) => {
+    const body = (await request.json()) as { address?: string; amountSol?: number };
+    if (!body.address) return HttpResponse.text("address required", { status: 400 });
+    await delay(400); // on-ramp confirmation
+    return HttpResponse.json(deposit(body.address, Number(body.amountSol ?? 0)));
+  }),
+
+  http.post("/api/wallet/withdraw", async ({ request }) => {
+    const body = (await request.json()) as {
+      address?: string;
+      amountSol?: number;
+      method?: string;
+    };
+    if (!body.address) return HttpResponse.text("address required", { status: 400 });
+    await delay(400);
+    const result = withdraw(body.address, Number(body.amountSol ?? 0), body.method ?? "PIX");
+    if (!result.ok) return HttpResponse.text(result.error, { status: 400 });
+    return HttpResponse.json(result.wallet);
+  }),
+
+  http.get("/api/fixtures/upcoming", () => {
+    return HttpResponse.json({ items: upcomingFixtures() });
   }),
 ];

@@ -12,6 +12,11 @@ export const MATCH_FULL_MIN = 98;
 
 export const STARTING_BALANCE_SOL = 4.2;
 
+/** Off-ramp: SOL ↔ local fiat (mocked rate; real build quotes a ramp/exchange partner). */
+export const FIAT_CURRENCY = "BRL";
+export const FIAT_RATE = 812.35; // BRL per 1 SOL
+export const WITHDRAW_FEE_PCT = 0.015;
+
 /** Resolution window per market, in match-minutes (real seconds = window / MATCH_MIN_PER_SEC). */
 export const WINDOW_MIN: Record<string, number> = {
   corner: 6,
