@@ -14,6 +14,7 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   const connect = useConnectWallet();
   const [createOpen, setCreateOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const goHome = () => navigate('/', { replace: true });
 
@@ -21,9 +22,18 @@ export function OnboardingPage() {
 
   // Google here is a simulated OAuth backed by the same embedded wallet (real SDK swap is the deferred step).
   const enterWithGoogle = async () => {
-    const wallet = loadEmbeddedWallet() ?? (await createEmbeddedWallet());
-    saveEmbeddedWallet(wallet);
-    connect.mutate({ provider: 'google', address: wallet.address }, { onSuccess: goHome });
+    if (busy) return;
+    setBusy(true);
+    try {
+      const wallet = loadEmbeddedWallet() ?? (await createEmbeddedWallet());
+      saveEmbeddedWallet(wallet);
+      connect.mutate(
+        { provider: 'google', address: wallet.address },
+        { onSuccess: goHome, onSettled: () => setBusy(false) },
+      );
+    } catch {
+      setBusy(false);
+    }
   };
 
   return (
@@ -48,7 +58,7 @@ export function OnboardingPage() {
       <div className="w-full space-y-3">
         <Button
           size="lg"
-          disabled={connect.isPending}
+          disabled={connect.isPending || busy}
           onClick={enterWithGoogle}
           className="bg-foreground text-background hover:bg-foreground/90 h-14 w-full text-base font-bold"
         >

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Copy, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
@@ -31,9 +31,10 @@ export function CreateWalletSheet({ open, onOpenChange, onConnected }: CreateWal
   const [revealed, setRevealed] = useState(false);
   const connect = useConnectWallet();
 
-  const generate = async () => {
+  const generate = useCallback(async () => {
     setStage('generating');
     setRevealed(false);
+    setWallet(null);
     try {
       const created = await createEmbeddedWallet();
       setWallet(created);
@@ -41,7 +42,12 @@ export function CreateWalletSheet({ open, onOpenChange, onConnected }: CreateWal
     } catch {
       setStage('unsupported');
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    void generate();
+  }, [open, generate]);
 
   const copy = async (value: string, label: string) => {
     await navigator.clipboard.writeText(value);
@@ -63,13 +69,7 @@ export function CreateWalletSheet({ open, onOpenChange, onConnected }: CreateWal
   };
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (next) void generate();
-      }}
-    >
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="bg-card mx-auto max-w-[430px]">
         <DrawerHeader className="text-center">
           <DrawerTitle className="font-display text-lime">Create a Solana wallet</DrawerTitle>
@@ -102,6 +102,7 @@ export function CreateWalletSheet({ open, onOpenChange, onConnected }: CreateWal
                   <Button
                     size="icon"
                     variant="ghost"
+                    aria-label="Copy address"
                     onClick={() => copy(wallet.address, 'Address')}
                   >
                     <Copy className="size-4" />
@@ -119,6 +120,7 @@ export function CreateWalletSheet({ open, onOpenChange, onConnected }: CreateWal
                     <Button
                       size="icon"
                       variant="ghost"
+                      aria-label="Copy secret key"
                       onClick={() => copy(wallet.secret, 'Secret')}
                     >
                       <Copy className="size-4" />
