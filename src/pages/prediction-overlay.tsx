@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { Check, ExternalLink, Share2, X } from 'lucide-react';
 import { MARKETS } from '@/entities/prediction';
 import { Button } from '@/shared/ui/button';
-import { CountdownRing, OnchainSeal } from '@/widgets';
+import { CountdownRing, Logo, OnchainSeal } from '@/widgets';
 import { formatClock, formatSol, shortHash } from '@/shared/lib/format';
 import { explorerTxUrl } from '@/shared/lib/solana-explorer';
 import { isDemo } from '@/shared/config';
@@ -78,12 +78,17 @@ export function PredictionOverlay({ id }: { id: string }) {
 
       {won && settlement && (
         <>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <div className="flex items-center gap-2">
-              <h2 className="font-display text-lime text-4xl font-extrabold">CALLED IT!</h2>
-              <Check className="text-lime size-9" strokeWidth={3} />
-            </div>
-            <p className="text-lime text-xs font-semibold tracking-widest">WON · PAID</p>
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="border-lime/30 bg-lime/10 glow-lime inline-flex items-center gap-1.5 rounded-2xl border px-6 py-3">
+              <Logo className="gap-1.5 text-4xl" />
+              <span className="font-display text-lime text-4xl font-black" aria-hidden="true">
+                !
+              </span>
+            </span>
+            <span className="bg-lime text-background inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[11px] font-bold tracking-[0.15em]">
+              <Check className="size-3" strokeWidth={3.5} />
+              WON · PAID
+            </span>
           </div>
           <div className="text-center">
             <p className="text-muted-foreground text-xs tracking-widest">TOTAL PAYOUT</p>
