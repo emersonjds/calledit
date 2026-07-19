@@ -30,6 +30,19 @@ export const matchSnapshotSchema = z.object({
   live: z.boolean(),
 });
 
+export const fixtureSchema = z.object({
+  id: z.string(),
+  home: teamInfoSchema,
+  away: teamInfoSchema,
+  kickoff: z.number(), // epoch ms — the only real source of a live match minute
+  stage: z.string(),
+  venue: z.string(),
+});
+
+export const fixturesSchema = z.object({
+  items: z.array(fixtureSchema),
+});
+
 export const walletAccountSchema = z.object({
   address: z.string(),
   balanceSol: z.number(),
@@ -49,6 +62,8 @@ const settlementSchema = z.object({
   payoutSol: z.number(),
   calledSecondsBefore: z.number(),
   resolvedEvent: matchEventSchema.nullable(),
+  payoutTxHash: z.string().optional(),
+  verifiedOnChain: z.boolean().optional(),
 });
 
 export const predictionSchema = z.object({
@@ -113,6 +128,7 @@ export const leaderboardSchema = z.object({
   ),
 });
 
+export type Fixture = z.infer<typeof fixtureSchema>;
 export type ProfileDto = z.infer<typeof profileSchema>;
 export type LeaderboardDto = z.infer<typeof leaderboardSchema>;
 export type LeaderboardEntry = LeaderboardDto['entries'][number];

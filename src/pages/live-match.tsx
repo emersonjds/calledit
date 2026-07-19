@@ -12,8 +12,11 @@ import {
   StakeSelector,
   StreakBanner,
 } from '@/widgets';
-import { formatSol } from '@/shared/lib/format';
-import { useMatchFeed } from '@/features/feed';
+import { MARKETS } from '@/entities/prediction';
+import { formatSol, shortAddress } from '@/shared/lib/format';
+import { liveMatchMinute } from '@/shared/lib/match-clock';
+import { TREASURY_ADDRESS, isDemo } from '@/shared/config';
+import { useLiveKickoff, useMatchFeed } from '@/features/feed';
 import { useMakePrediction } from '@/features/prediction';
 import { useProfile } from '@/features/profile';
 import { useSession } from '@/store/session';
@@ -21,6 +24,7 @@ import { PredictionOverlay } from './prediction-overlay';
 
 export function LiveMatchPage() {
   const feed = useMatchFeed();
+  const kickoff = useLiveKickoff();
   const profile = useProfile();
   const makePrediction = useMakePrediction();
   const selectedMarket = useSession((state) => state.selectedMarket);
@@ -31,6 +35,11 @@ export function LiveMatchPage() {
   const balance = profile.data?.balanceSol ?? 0;
   const streak = profile.data?.currentStreak ?? 0;
 
+  // LIVE mode has no feed clock — derive the minute from kickoff + wall-clock (re-read
+  // every 1s feed refetch). Demo keeps the compressed clock from the mock engine.
+  const clockMin =
+    !isDemo() && kickoff !== null ? liveMatchMinute(kickoff) : (feed.data?.clockMin ?? 0);
+
   const canCall =
     selectedMarket !== null &&
     stake > 0 &&
@@ -40,6 +49,14 @@ export function LiveMatchPage() {
 
   const call = () => {
     if (!selectedMarket) return;
+    // Honest pre-sign summary: Phantom is about to send a REAL devnet transfer.
+    const ok = window.confirm(
+      `Sign a real devnet stake?\n\n` +
+        `Market: Next ${MARKETS[selectedMarket].label}\n` +
+        `Stake: ${formatSol(stake)}\n` +
+        `To treasury: ${shortAddress(TREASURY_ADDRESS)}`,
+    );
+    if (!ok) return;
     makePrediction.mutate(
       { market: selectedMarket, stakeSol: stake },
       { onError: (error) => toast.error((error as Error).message) },
@@ -78,7 +95,7 @@ export function LiveMatchPage() {
             home={feed.data.home}
             away={feed.data.away}
             score={feed.data.score}
-            clockMin={feed.data.clockMin}
+            clockMin={clockMin}
             period={feed.data.period}
             live={feed.data.live}
           />
@@ -100,6 +117,11 @@ export function LiveMatchPage() {
             {makePrediction.isPending ? 'Stamping on-chain…' : 'CALL IT'}
             <Zap className="size-5" />
           </Button>
+          {!feed.data.live && (
+            <p className="text-muted-foreground text-center text-xs">
+              This match isn’t live — calls open once play starts.
+            </p>
+          )}
         </>
       )}
 
