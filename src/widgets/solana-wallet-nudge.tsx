@@ -29,7 +29,7 @@ export function SolanaWalletNudge() {
         >
           Create
         </Button>
-        <Button size="icon" variant="ghost" onClick={() => setDismissed(true)}>
+        <Button size="icon" variant="ghost" aria-label="Dismiss" onClick={() => setDismissed(true)}>
           <X className="size-4" />
         </Button>
       </div>
