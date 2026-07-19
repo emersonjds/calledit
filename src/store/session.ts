@@ -16,7 +16,6 @@ interface SessionState {
   disconnect: () => void;
   selectMarket: (market: MarketId | null) => void;
   setActivePrediction: (id: string | null) => void;
-  selectMatch: (id: string) => void;
 }
 
 export const useSession = create<SessionState>()(
@@ -38,7 +37,6 @@ export const useSession = create<SessionState>()(
         set({ address: null, provider: null, chain: null, activePredictionId: null }),
       selectMarket: (market) => set({ selectedMarket: market }),
       setActivePrediction: (id) => set({ activePredictionId: id }),
-      selectMatch: (id) => set({ matchId: id }),
     }),
     {
       name: 'called-it:session',

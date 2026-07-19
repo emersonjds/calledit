@@ -1,9 +1,7 @@
 import type { MatchSnapshot } from '@/entities/match';
 import type { MarketId, Prediction } from '@/entities/prediction';
 import type { WalletAccount, WalletOverview } from '@/entities/wallet';
-import type { MatchCard } from '@/entities/fixture';
 import {
-  matchListSchema,
   historySchema,
   leaderboardSchema,
   matchSnapshotSchema,
@@ -96,9 +94,5 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ address, amountSol, method }),
     }) as Promise<WalletOverview>;
-  },
-
-  getMatches(): Promise<MatchCard[]> {
-    return request('/matches', matchListSchema).then((result) => result.items as MatchCard[]);
   },
 };

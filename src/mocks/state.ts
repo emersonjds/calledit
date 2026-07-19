@@ -1,6 +1,5 @@
 import type { Prediction } from '@/entities/prediction';
-import type { MatchEventType, TeamInfo } from '@/entities/match';
-import type { MatchCard } from '@/entities/fixture';
+import type { MatchEventType } from '@/entities/match';
 import type { WalletActivity, WalletOverview } from '@/entities/wallet';
 import {
   FIAT_CURRENCY,
@@ -196,66 +195,4 @@ export function commitPersist(): void {
 
 export function allLedgers(): AddressLedger[] {
   return Object.values(state.ledgers);
-}
-
-const T = (code: string, name: string, flag: string): TeamInfo => ({ code, name, flag });
-
-interface RecentPlan {
-  home: TeamInfo;
-  away: TeamInfo;
-  score: [number, number];
-  stage: string;
-  venue: string;
-  hoursAgo: number;
-}
-
-/** Recently finished World Cup matches — final scores, played time derived from now. */
-const RECENT_PLAN: RecentPlan[] = [
-  {
-    home: T('ARG', 'Argentina', '🇦🇷'),
-    away: T('CRO', 'Croatia', '🇭🇷'),
-    score: [3, 0],
-    stage: 'Quarter-final',
-    venue: 'Lusail Stadium',
-    hoursAgo: 22,
-  },
-  {
-    home: T('ESP', 'Spain', '🇪🇸'),
-    away: T('GER', 'Germany', '🇩🇪'),
-    score: [2, 1],
-    stage: 'Quarter-final',
-    venue: 'SoFi Stadium',
-    hoursAgo: 26,
-  },
-  {
-    home: T('FRA', 'France', '🇫🇷'),
-    away: T('POR', 'Portugal', '🇵🇹'),
-    score: [1, 1],
-    stage: 'Quarter-final',
-    venue: 'MetLife Stadium',
-    hoursAgo: 46,
-  },
-  {
-    home: T('BRA', 'Brazil', '🇧🇷'),
-    away: T('NED', 'Netherlands', '🇳🇱'),
-    score: [4, 2],
-    stage: 'Quarter-final',
-    venue: 'AT&T Stadium',
-    hoursAgo: 50,
-  },
-];
-
-export function recentMatches(): MatchCard[] {
-  const now = Date.now();
-  return RECENT_PLAN.map((plan, index) => ({
-    id: `rc-${index}`,
-    home: plan.home,
-    away: plan.away,
-    score: plan.score,
-    status: 'finished',
-    clockMin: MATCH_FULL_MIN,
-    playedAt: now - plan.hoursAgo * 3_600_000,
-    stage: plan.stage,
-    venue: plan.venue,
-  }));
 }

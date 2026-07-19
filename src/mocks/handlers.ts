@@ -1,9 +1,8 @@
 import { http, HttpResponse, delay } from 'msw';
 import { isMarketId } from '@/entities/prediction';
 import type { WalletAccount, ChainKind } from '@/entities/wallet';
-import type { MatchCard } from '@/entities/fixture';
 import { snapshotAt } from './match-engine';
-import { deposit, getLedger, getMatch, recentMatches, walletOverview, withdraw } from './state';
+import { deposit, getLedger, getMatch, walletOverview, withdraw } from './state';
 import { commit, getPrediction, leaderboard, profile } from './onchain';
 import { mulberry32, seedFromString } from './prng';
 
@@ -107,21 +106,5 @@ export const handlers = [
     const result = withdraw(body.address, Number(body.amountSol ?? 0), body.method ?? 'PIX');
     if (!result.ok) return HttpResponse.text(result.error, { status: 400 });
     return HttpResponse.json(result.wallet);
-  }),
-
-  http.get('/api/matches', () => {
-    const snap = snapshotAt(getMatch());
-    const live: MatchCard = {
-      id: snap.matchId,
-      home: snap.home,
-      away: snap.away,
-      score: snap.score,
-      status: 'live',
-      clockMin: snap.clockMin,
-      playedAt: Date.now(),
-      stage: 'Semi-final',
-      venue: 'MetLife Stadium',
-    };
-    return HttpResponse.json({ items: [live, ...recentMatches()] });
   }),
 ];
