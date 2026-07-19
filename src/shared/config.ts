@@ -10,6 +10,9 @@ export const API_BASE_URL: string =
 export const SOLANA_RPC_URL: string =
   import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
 
+// The real TxLINE fixture the live match tracks by default (Spain vs Argentina). Override per event.
+export const LIVE_MATCH_ID: string = import.meta.env.VITE_LIVE_MATCH_ID ?? '18257739';
+
 // Pure so it is unit-testable; the two args are the only inputs.
 export function resolveMode(persisted: string | null, forceDemoEnv: string | undefined): AppMode {
   if (persisted === 'demo' || persisted === 'live') return persisted;

@@ -1,14 +1,22 @@
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/shared/ui/badge';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { formatCountdown, formatKickoff } from '@/shared/lib/format';
 import { useUpcomingFixtures } from '@/features/fixtures';
+import { useSession } from '@/store/session';
 import type { Fixture } from '@/entities/fixture';
 
 export function MatchesPage() {
   const fixtures = useUpcomingFixtures();
   const items = fixtures.data ?? [];
+  const navigate = useNavigate();
+  const selectMatch = useSession((state) => state.selectMatch);
+
+  const open = (id: string) => {
+    selectMatch(id);
+    navigate('/');
+  };
 
   return (
     <div className="space-y-4 px-4 py-4">
@@ -31,7 +39,7 @@ export function MatchesPage() {
       ) : (
         <div className="space-y-3">
           {items.map((fixture) => (
-            <FixtureCard key={fixture.id} fixture={fixture} />
+            <FixtureCard key={fixture.id} fixture={fixture} onOpen={() => open(fixture.id)} />
           ))}
         </div>
       )}
@@ -41,13 +49,14 @@ export function MatchesPage() {
 
 interface FixtureCardProps {
   fixture: Fixture;
+  onOpen: () => void;
 }
 
-function FixtureCard({ fixture }: FixtureCardProps) {
+function FixtureCard({ fixture, onOpen }: FixtureCardProps) {
   return (
     <button
       type="button"
-      onClick={() => toast('Predictions open at kickoff')}
+      onClick={onOpen}
       className="border-border bg-card hover:border-lime/40 w-full space-y-3 rounded-2xl border px-4 py-4 text-left transition-colors"
     >
       <div className="flex items-center justify-between">
