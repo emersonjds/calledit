@@ -27,6 +27,7 @@ import { TREASURY_ADDRESS, isDemo } from '@/shared/config';
 import { useLiveKickoff, useMatchFeed } from '@/features/feed';
 import { useMakePrediction } from '@/features/prediction';
 import { useProfile } from '@/features/profile';
+import { useOnchainBalance } from '@/features/wallet';
 import { useSession } from '@/store/session';
 import { PredictionOverlay } from './prediction-overlay';
 
@@ -39,10 +40,16 @@ export function LiveMatchPage() {
   const selectMarket = useSession((state) => state.selectMarket);
   const activePredictionId = useSession((state) => state.activePredictionId);
   const address = useSession((state) => state.address);
+  const chain = useSession((state) => state.chain);
 
   const [stake, setStake] = useState(0.05);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const balance = profile.data?.balanceSol ?? 0;
+  // Live mode shows the wallet's real on-chain devnet balance; demo uses the mock ledger.
+  const onchainBalance = useOnchainBalance(address, !isDemo() && chain === 'solana');
+  const balance =
+    !isDemo() && onchainBalance.data !== undefined
+      ? onchainBalance.data
+      : (profile.data?.balanceSol ?? 0);
   const streak = profile.data?.currentStreak ?? 0;
 
   // LIVE mode has no feed clock — derive the minute from kickoff + wall-clock (re-read
