@@ -22,13 +22,8 @@ describe('detectWallets', () => {
     expect(options.every((option) => option.connect === undefined)).toBe(true);
   });
 
-  it('lists phantom, solflare, backpack and metamask', () => {
+  it('lists phantom and metamask', () => {
     globalWithWindow.window = {};
-    expect(detectWallets().map((option) => option.id)).toEqual([
-      'phantom',
-      'solflare',
-      'backpack',
-      'metamask',
-    ]);
+    expect(detectWallets().map((option) => option.id)).toEqual(['phantom', 'metamask']);
   });
 });

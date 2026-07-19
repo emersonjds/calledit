@@ -19,8 +19,6 @@ interface EvmProvider {
 declare global {
   interface Window {
     phantom?: { solana?: SolanaProvider };
-    solflare?: SolanaProvider;
-    backpack?: SolanaProvider;
     ethereum?: EvmProvider;
   }
 }
@@ -39,8 +37,6 @@ function evmConnect(provider: EvmProvider): () => Promise<string> {
 export function detectWallets(): WalletOption[] {
   const win: Window | undefined = typeof window !== 'undefined' ? window : undefined;
   const phantom = win?.phantom?.solana;
-  const solflare = win?.solflare;
-  const backpack = win?.backpack;
   const ethereum = win?.ethereum;
   return [
     {
@@ -50,22 +46,6 @@ export function detectWallets(): WalletOption[] {
       installLink: 'https://phantom.app',
       installed: Boolean(phantom),
       connect: phantom ? solanaConnect(phantom) : undefined,
-    },
-    {
-      id: 'solflare',
-      label: 'Solflare',
-      chain: 'solana',
-      installLink: 'https://solflare.com',
-      installed: Boolean(solflare),
-      connect: solflare ? solanaConnect(solflare) : undefined,
-    },
-    {
-      id: 'backpack',
-      label: 'Backpack',
-      chain: 'solana',
-      installLink: 'https://backpack.app',
-      installed: Boolean(backpack),
-      connect: backpack ? solanaConnect(backpack) : undefined,
     },
     {
       id: 'metamask',

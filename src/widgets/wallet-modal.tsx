@@ -10,6 +10,7 @@ import {
 } from '@/shared/ui/dialog';
 import { detectWallets, type WalletOption } from '@/entities/wallet/adapters';
 import { useConnectWallet } from '@/features/wallet';
+import { MetaMaskIcon, PhantomIcon } from '@/widgets/wallet-icons';
 
 export interface WalletModalProps {
   open: boolean;
@@ -60,9 +61,7 @@ export function WalletModal({ open, onOpenChange, onConnected }: WalletModalProp
               onClick={() => pick(option)}
               className="border-border bg-background hover:border-lime/50 flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors disabled:opacity-60"
             >
-              <span className="bg-card text-foreground flex size-9 items-center justify-center rounded-lg text-sm font-bold">
-                {option.label.charAt(0)}
-              </span>
+              {option.id === 'phantom' ? <PhantomIcon /> : <MetaMaskIcon />}
               <span className="text-foreground flex-1 font-semibold">{option.label}</span>
               {option.installed ? (
                 <span className="text-lime text-xs">Detected</span>
