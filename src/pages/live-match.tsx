@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Wallet, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog';
 import { Skeleton } from '@/shared/ui/skeleton';
 import {
   EventTicker,
@@ -31,8 +38,10 @@ export function LiveMatchPage() {
   const selectedMarket = useSession((state) => state.selectedMarket);
   const selectMarket = useSession((state) => state.selectMarket);
   const activePredictionId = useSession((state) => state.activePredictionId);
+  const address = useSession((state) => state.address);
 
   const [stake, setStake] = useState(0.05);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const balance = profile.data?.balanceSol ?? 0;
   const streak = profile.data?.currentStreak ?? 0;
 
@@ -48,20 +57,31 @@ export function LiveMatchPage() {
     !makePrediction.isPending &&
     feed.data?.live === true;
 
-  const call = () => {
+  const ackKey = address ? `called-it:stake-ack:${address}` : null;
+
+  const submit = () => {
     if (!selectedMarket) return;
-    // Honest pre-sign summary: Phantom is about to send a REAL devnet transfer.
-    const ok = window.confirm(
-      `Sign a real devnet stake?\n\n` +
-        `Market: Next ${MARKETS[selectedMarket].label}\n` +
-        `Stake: ${formatSol(stake)}\n` +
-        `To treasury: ${shortAddress(TREASURY_ADDRESS)}`,
-    );
-    if (!ok) return;
     makePrediction.mutate(
       { market: selectedMarket, stakeSol: stake },
       { onError: (error) => toast.error((error as Error).message) },
     );
+  };
+
+  const call = () => {
+    if (!selectedMarket) return;
+    // First call for a wallet asks for confirmation; after that it signs straight away.
+    if (ackKey && localStorage.getItem(ackKey) === '1') {
+      toast('Confirmation set for this wallet — signing…', { duration: 1500 });
+      submit();
+      return;
+    }
+    setConfirmOpen(true);
+  };
+
+  const confirmAndSubmit = () => {
+    if (ackKey) localStorage.setItem(ackKey, '1');
+    setConfirmOpen(false);
+    submit();
   };
 
   return (
@@ -125,6 +145,60 @@ export function LiveMatchPage() {
       )}
 
       {activePredictionId && <PredictionOverlay id={activePredictionId} />}
+
+      {selectedMarket && (
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent className="border-lime/25 bg-card max-w-sm rounded-3xl">
+            <DialogHeader className="items-center text-center">
+              <span className="border-lime/30 bg-lime/10 mb-1 flex size-12 items-center justify-center rounded-2xl border">
+                <Zap className="text-lime size-6" fill="currentColor" />
+              </span>
+              <DialogTitle className="font-display text-xl font-bold tracking-tight">
+                {isDemo() ? 'Place your call' : 'Confirm your call'}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-sm">
+                {isDemo()
+                  ? 'Simulated call — no real funds move.'
+                  : 'Phantom will sign a real devnet stake to the treasury.'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="border-border bg-background/40 space-y-2.5 rounded-2xl border p-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Market</span>
+                <span className="font-semibold">Next {MARKETS[selectedMarket].label}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Stake</span>
+                <span className="text-lime font-mono font-semibold">{formatSol(stake)}</span>
+              </div>
+              {!isDemo() && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">To treasury</span>
+                  <span className="font-mono text-xs">{shortAddress(TREASURY_ADDRESS)}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-muted-foreground text-center text-xs">
+              We’ll only ask once — after this, this wallet signs instantly.
+            </p>
+
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setConfirmOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={confirmAndSubmit}
+                className="bg-lime text-background hover:bg-lime/90 flex-1 font-bold"
+              >
+                {isDemo() ? 'Call it' : 'Sign & call it'}
+                <Zap className="size-4" />
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
