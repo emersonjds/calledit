@@ -6,3 +6,4 @@ export { PredictionBoard } from './PredictionBoard';
 export { StakeSelector } from './StakeSelector';
 export { OnchainSeal } from './OnchainSeal';
 export { CountdownRing } from './CountdownRing';
+export { Logo, LogoMark } from './Logo';

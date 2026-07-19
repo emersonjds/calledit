@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { Skeleton } from '@/shared/ui/skeleton';
 import {
   EventTicker,
+  Logo,
   MatchHeader,
   PctMeter,
   PredictionBoard,
@@ -71,9 +72,7 @@ export function LiveMatchPage() {
         <span className="text-foreground font-semibold">TxLINE</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="font-display text-lime text-lg font-extrabold tracking-tight">
-          CALLED IT
-        </span>
+        <Logo compact />
         <Link
           to="/wallet"
           className="border-border bg-card text-foreground hover:border-lime flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-xs transition-colors"

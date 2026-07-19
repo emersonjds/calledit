@@ -22,19 +22,26 @@ export function OnboardingPage() {
 
   const goHome = () => navigate('/', { replace: true });
 
-  // A fresh landing is always live (fetch real data); only "Try the demo" opts into the simulated sandbox.
+  // Demo mode only boots MSW at startup (main.tsx) and the session store reads the matchId once
+  // at module load — switching mode in place leaves both stale (real API 404s, wrong match).
+  // So "Try the demo" reloads into a fresh demo boot; this effect finishes that handoff by
+  // connecting as guest once the page comes back up in demo mode.
   useEffect(() => {
-    setMode('live');
+    const resumingDemo = new URLSearchParams(window.location.search).get('demo') === '1';
+    if (!resumingDemo) {
+      // A fresh landing is always live (fetch real data); only "Try the demo" opts into the sandbox.
+      setMode('live');
+      return;
+    }
+    window.history.replaceState({}, '', '/onboarding');
+    connect.mutate({ provider: 'guest' }, { onSuccess: goHome });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setMode]);
 
-  // Demo: switch to simulated mode, boot MSW, then enter the app as a guest — no reload.
-  const enterDemo = async () => {
+  const enterDemo = () => {
     if (busy) return;
-    setBusy(true);
     setMode('demo');
-    const { startMockServer } = await import('@/mocks/browser');
-    await startMockServer();
-    connect.mutate({ provider: 'guest' }, { onSuccess: goHome, onSettled: () => setBusy(false) });
+    window.location.assign('/onboarding?demo=1');
   };
 
   // Google here is a simulated OAuth backed by the same embedded wallet (real SDK swap is the deferred step).
