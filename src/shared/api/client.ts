@@ -2,6 +2,7 @@ import type { MatchSnapshot } from '@/entities/match';
 import type { MarketId, Prediction } from '@/entities/prediction';
 import type { WalletAccount, WalletOverview } from '@/entities/wallet';
 import {
+  fixturesSchema,
   historySchema,
   leaderboardSchema,
   matchSnapshotSchema,
@@ -9,6 +10,7 @@ import {
   profileSchema,
   walletAccountSchema,
   walletOverviewSchema,
+  type Fixture,
   type LeaderboardDto,
   type ProfileDto,
 } from './schemas';
@@ -36,6 +38,7 @@ export interface CommitPredictionInput {
   market: MarketId;
   stakeSol: number;
   address: string;
+  stakeTxSig: string;
 }
 
 export const api = {
@@ -48,6 +51,10 @@ export const api = {
 
   getFeed(matchId: string): Promise<MatchSnapshot> {
     return request(`/feed/${matchId}`, matchSnapshotSchema) as Promise<MatchSnapshot>;
+  },
+
+  getUpcomingFixtures(): Promise<Fixture[]> {
+    return request('/fixtures/upcoming', fixturesSchema).then((result) => result.items);
   },
 
   commitPrediction(input: CommitPredictionInput): Promise<Prediction> {

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Check, Share2, X } from 'lucide-react';
+import { Check, ExternalLink, Share2, X } from 'lucide-react';
 import { MARKETS } from '@/entities/prediction';
 import { Button } from '@/shared/ui/button';
 import { CountdownRing, OnchainSeal } from '@/widgets';
-import { formatSol, shortHash } from '@/shared/lib/format';
+import { formatClock, formatSol, shortHash } from '@/shared/lib/format';
+import { explorerTxUrl } from '@/shared/lib/solana-explorer';
+import { isDemo } from '@/shared/config';
 import { MATCH_MIN_PER_SEC } from '@/mocks/config';
 import { usePredictionStatus } from '@/features/prediction';
 import { useSession } from '@/store/session';
@@ -19,7 +21,13 @@ export function PredictionOverlay({ id }: { id: string }) {
     selectMarket(null);
   };
 
-  const total = prediction ? Math.max(3, Math.round(prediction.windowMin / MATCH_MIN_PER_SEC)) : 10;
+  // LIVE settles in real wall-clock: windowMin is 5 REAL minutes. Demo compresses
+  // match-minutes into seconds via the mock engine's MATCH_MIN_PER_SEC.
+  const total = prediction
+    ? isDemo()
+      ? Math.max(3, Math.round(prediction.windowMin / MATCH_MIN_PER_SEC))
+      : prediction.windowMin * 60
+    : 10;
   const [secondsLeft, setSecondsLeft] = useState(total);
 
   useEffect(() => {
@@ -45,13 +53,15 @@ export function PredictionOverlay({ id }: { id: string }) {
         <>
           <OnchainSeal verified stampedAt={prediction.stamp.stampedAt} size={128} />
           <div className="space-y-1 text-center">
-            <p className="text-lime text-xs font-semibold tracking-widest">
-              STAMPED ON-CHAIN · VERIFIED
-            </p>
+            <p className="text-lime text-xs font-semibold tracking-widest">STAKE ON-CHAIN</p>
             <h2 className="font-display text-2xl font-bold">Prediction Committed</h2>
-            <p className="text-muted-foreground font-mono text-xs">
-              tx {shortHash(prediction.stamp.txHash)} · seq {prediction.stamp.seq}
-            </p>
+            <div className="text-muted-foreground flex items-center justify-center gap-1.5 font-mono text-xs">
+              <ExplorerLink sig={prediction.stamp.txHash} label="stake tx" />
+              <span>· seq {prediction.stamp.seq}</span>
+              {prediction.atClockMin > 0 && (
+                <span>· called {formatClock(prediction.atClockMin)}</span>
+              )}
+            </div>
           </div>
           <div className="grid w-full grid-cols-2 gap-3">
             <Stat label="Predicted" value={`Next ${marketLabel}`} />
@@ -73,9 +83,7 @@ export function PredictionOverlay({ id }: { id: string }) {
               <h2 className="font-display text-lime text-4xl font-extrabold">CALLED IT!</h2>
               <Check className="text-lime size-9" strokeWidth={3} />
             </div>
-            <p className="text-muted-foreground text-xs font-semibold tracking-widest">
-              PREDICTION VERIFIED
-            </p>
+            <p className="text-lime text-xs font-semibold tracking-widest">WON · PAID</p>
           </div>
           <div className="text-center">
             <p className="text-muted-foreground text-xs tracking-widest">TOTAL PAYOUT</p>
@@ -96,6 +104,16 @@ export function PredictionOverlay({ id }: { id: string }) {
             <p className="text-muted-foreground font-mono text-xs">
               proof {shortHash(settlement.proofId)}
             </p>
+            {settlement.payoutTxHash && (
+              <p>
+                <ExplorerLink sig={settlement.payoutTxHash} label="payout tx" />
+              </p>
+            )}
+            {settlement.verifiedOnChain && (
+              <p className="text-lime/90 text-[11px] font-semibold tracking-wide">
+                validated on-chain (validate_stat)
+              </p>
+            )}
           </div>
           <div className="w-full space-y-2">
             <Button
@@ -136,6 +154,20 @@ export function PredictionOverlay({ id }: { id: string }) {
         </>
       )}
     </div>
+  );
+}
+
+function ExplorerLink({ sig, label }: { sig: string; label: string }) {
+  return (
+    <a
+      href={explorerTxUrl(sig)}
+      target="_blank"
+      rel="noreferrer"
+      className="text-lime inline-flex items-center gap-1 font-mono underline underline-offset-2 hover:opacity-80"
+    >
+      {label} {shortHash(sig)}
+      <ExternalLink className="size-3" />
+    </a>
   );
 }
 

@@ -3,11 +3,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // @solana/web3.js needs a global Buffer that Vite externalizes in the browser.
+    nodePolyfills({ globals: { Buffer: true } }),
     VitePWA({
       registerType: 'autoUpdate',
       // Do not register a workbox SW: MSW owns the service worker in this demo

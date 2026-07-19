@@ -17,6 +17,8 @@ export interface Settlement {
   payoutSol: number;
   calledSecondsBefore: number;
   resolvedEvent: MatchEvent | null;
+  payoutTxHash?: string; // real devnet payout signature (won only)
+  verifiedOnChain?: boolean; // backend confirmed via validate_stat
 }
 
 export interface Prediction {
