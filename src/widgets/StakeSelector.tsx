@@ -7,7 +7,7 @@ interface StakeSelectorProps {
   onChange: (value: number) => void;
 }
 
-const QUICK_PICKS = [1, 5, 10] as const;
+const QUICK_PICKS = [0.02, 0.05, 0.1, 0.25] as const;
 
 export function StakeSelector({ value, balanceSol, onChange }: StakeSelectorProps) {
   return (
@@ -16,7 +16,7 @@ export function StakeSelector({ value, balanceSol, onChange }: StakeSelectorProp
         <p className="text-muted-foreground text-xs font-semibold tracking-wide">STAKE (SOL)</p>
         <p className="text-muted-foreground text-xs">Balance: {formatSol(balanceSol)}</p>
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {QUICK_PICKS.map((amount) => (
           <button
             key={amount}

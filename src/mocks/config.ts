@@ -1,14 +1,14 @@
 /** Demo match identity + time compression. One live World Cup fixture drives the app. */
-export const DEMO_MATCH_ID = 'wc26-bra-fra';
+export const DEMO_MATCH_ID = 'eng-fra-6-4';
 
-export const HOME_TEAM = { code: 'BRA', name: 'Brazil', flag: '🇧🇷' } as const;
+export const HOME_TEAM = { code: 'ENG', name: 'England', flag: '🇬🇧' } as const;
 export const AWAY_TEAM = { code: 'FRA', name: 'France', flag: '🇫🇷' } as const;
 
-/** Match minutes advanced per real second (~128s of real time = a full 90'). */
-export const MATCH_MIN_PER_SEC = 0.7;
+/** Match minutes advanced per real second (~120s of real time = a full 96'). */
+export const MATCH_MIN_PER_SEC = 0.8;
 
-/** Total playable match minutes before the engine restarts with a fresh seed. */
-export const MATCH_FULL_MIN = 98;
+/** Total playable match minutes before the engine restarts the scripted fixture. */
+export const MATCH_FULL_MIN = 96;
 
 export const STARTING_BALANCE_SOL = 4.2;
 
@@ -19,7 +19,7 @@ export const WITHDRAW_FEE_PCT = 0.015;
 
 /** Resolution window per market, in match-minutes (real seconds = window / MATCH_MIN_PER_SEC). */
 export const WINDOW_MIN: Record<string, number> = {
-  corner: 6,
+  corner: 4,
   card: 10,
   goal: 16,
   foul: 4,
