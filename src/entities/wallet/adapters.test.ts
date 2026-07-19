@@ -26,4 +26,30 @@ describe('detectWallets', () => {
     globalWithWindow.window = {};
     expect(detectWallets().map((option) => option.id)).toEqual(['phantom', 'metamask']);
   });
+
+  it('falls back to window.solana when isPhantom is set there', () => {
+    globalWithWindow.window = { solana: { isPhantom: true } };
+    const phantom = detectWallets().find((option) => option.id === 'phantom');
+    expect(phantom?.installed).toBe(true);
+  });
+
+  it('ignores window.solana from a non-Phantom provider', () => {
+    globalWithWindow.window = { solana: { isPhantom: false } };
+    const phantom = detectWallets().find((option) => option.id === 'phantom');
+    expect(phantom?.installed).toBe(false);
+  });
+
+  it('picks MetaMask out of a multi-wallet providers array', () => {
+    globalWithWindow.window = {
+      ethereum: { providers: [{ isMetaMask: false }, { isMetaMask: true }] },
+    };
+    const metamask = detectWallets().find((option) => option.id === 'metamask');
+    expect(metamask?.installed).toBe(true);
+  });
+
+  it('does not treat a non-MetaMask injected provider as MetaMask', () => {
+    globalWithWindow.window = { ethereum: { isMetaMask: false } };
+    const metamask = detectWallets().find((option) => option.id === 'metamask');
+    expect(metamask?.installed).toBe(false);
+  });
 });
