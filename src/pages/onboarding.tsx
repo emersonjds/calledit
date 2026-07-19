@@ -4,6 +4,7 @@ import { Check, Mail, Wallet } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { CreateWalletSheet } from '@/widgets/create-wallet-sheet';
 import { useConnectWallet } from '@/features/wallet';
+import { useAppMode } from '@/store/app-mode';
 import {
   createEmbeddedWallet,
   loadEmbeddedWallet,
@@ -13,6 +14,7 @@ import {
 export function OnboardingPage() {
   const navigate = useNavigate();
   const connect = useConnectWallet();
+  const enterDemo = useAppMode((state) => state.enterDemo);
   const [createOpen, setCreateOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -98,6 +100,14 @@ export function OnboardingPage() {
           className="text-muted-foreground h-12 w-full"
         >
           Play as guest
+        </Button>
+        <Button
+          size="lg"
+          variant="ghost"
+          onClick={enterDemo}
+          className="text-flame h-11 w-full text-sm"
+        >
+          Enter as demo (simulated)
         </Button>
         <p className="text-muted-foreground pt-2 text-xs">
           🔒 Secured by Solana · By connecting you agree to the Terms and confirm you are over 18.
