@@ -28,15 +28,6 @@ function base64UrlToBytes(base64Url: string): Uint8Array {
   return bytes;
 }
 
-export async function isEmbeddedWalletSupported(): Promise<boolean> {
-  try {
-    await crypto.subtle.generateKey({ name: 'Ed25519' }, false, ['sign', 'verify']);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export async function createEmbeddedWallet(): Promise<EmbeddedWallet> {
   const pair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
   const publicKey = new Uint8Array(await crypto.subtle.exportKey('raw', pair.publicKey));
