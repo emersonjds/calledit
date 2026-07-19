@@ -14,7 +14,7 @@ export function RequireWallet({ children }: { children: ReactNode }) {
 export function AppLayout() {
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col">
-      <main className="flex-1 overflow-y-auto pb-2">
+      <main className="no-scrollbar flex-1 overflow-y-auto pb-2">
         <DemoBadge />
         <SolanaWalletNudge />
         <Outlet />

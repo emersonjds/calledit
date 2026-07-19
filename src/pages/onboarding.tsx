@@ -51,7 +51,7 @@ export function OnboardingPage() {
   };
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between overflow-y-auto px-6 py-14 text-center">
+    <div className="no-scrollbar flex min-h-0 w-full flex-1 flex-col items-center justify-between overflow-y-auto px-6 py-14 text-center">
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
         <div className="border-lime glow-lime relative flex size-32 items-center justify-center rounded-full border-2">
           <Check className="text-lime size-16" strokeWidth={3} />
