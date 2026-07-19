@@ -73,7 +73,7 @@ export function WalletModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card mx-auto w-[calc(100%-2.5rem)] max-w-[400px] rounded-2xl">
+      <DialogContent className="bg-card mx-auto w-[calc(100%-2.5rem)] max-w-100 rounded-2xl">
         <DialogHeader className="text-center">
           <DialogTitle className="font-display text-foreground">Log in or sign up</DialogTitle>
           <DialogDescription className="text-muted-foreground">
