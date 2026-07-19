@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Link2, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
+import { Logo } from '@/widgets';
 import { CreateWalletSheet } from '@/widgets/create-wallet-sheet';
 import { WalletModal } from '@/widgets/wallet-modal';
 import { useConnectWallet } from '@/features/wallet';
@@ -72,8 +73,8 @@ export function OnboardingPage() {
           <Check className="text-lime size-16" strokeWidth={3} />
         </div>
         <div className="space-y-3.5">
-          <h1 className="font-display text-lime text-4xl font-extrabold tracking-tight">
-            CALLED IT
+          <h1 className="flex justify-center">
+            <Logo className="text-4xl" />
           </h1>
           <p className="font-display text-foreground text-2xl font-bold">
             Prove you called <span className="text-lime italic">it</span> first.
