@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { WalletOverview } from '@/entities/wallet';
 import { api } from '@/shared/api';
 import { useSession } from '@/store/session';
+import { SOLANA_RPC_URL } from '@/shared/config';
+import { getSolBalance } from '@/shared/lib/solana-rpc';
 
 /** Connect a wallet provider through the adapter seam. `address` is set for app-created/embedded wallets. */
 export function useConnectWallet() {
@@ -21,6 +23,18 @@ export function useWalletOverview() {
     queryFn: () => api.getWallet(address as string),
     enabled: address !== null,
     refetchInterval: 3000,
+  });
+}
+
+/** Real on-chain SOL balance for a connected Solana address. Never crashes the page — errors just leave the value undefined and the caller falls back to the stub balance. */
+export function useOnchainBalance(address: string | null, enabled: boolean) {
+  return useQuery({
+    queryKey: ['onchain-balance', address],
+    queryFn: () => getSolBalance(address as string, SOLANA_RPC_URL),
+    enabled: enabled && address !== null,
+    staleTime: 10_000,
+    refetchInterval: 15_000,
+    retry: 1,
   });
 }
 
