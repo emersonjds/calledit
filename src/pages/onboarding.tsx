@@ -112,8 +112,11 @@ export function OnboardingPage() {
         >
           Enter as demo (simulated)
         </Button>
-        <p className="text-muted-foreground pt-2 text-xs">
-          🔒 Secured by Solana · By connecting you agree to the Terms and confirm you are over 18.
+        <p className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-1.5 pt-2 text-xs">
+          <img src="/solana.png" alt="Solana" className="size-3.5" />
+          <span>
+            Secured by Solana · By connecting you agree to the Terms and confirm you are over 18.
+          </span>
         </p>
       </div>
 
