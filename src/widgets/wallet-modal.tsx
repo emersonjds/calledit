@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Mail, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -16,11 +16,25 @@ export interface WalletModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConnected: () => void;
+  onGoogle: () => void | Promise<void>;
+  onCreateNew: () => void;
+  busy?: boolean;
 }
 
-export function WalletModal({ open, onOpenChange, onConnected }: WalletModalProps) {
+const ROW =
+  'border-border bg-background hover:border-lime/50 flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors disabled:opacity-60';
+
+export function WalletModal({
+  open,
+  onOpenChange,
+  onConnected,
+  onGoogle,
+  onCreateNew,
+  busy = false,
+}: WalletModalProps) {
   const connect = useConnectWallet();
   const [wallets] = useState<WalletOption[]>(detectWallets);
+  const pending = connect.isPending || busy;
 
   const pick = async (option: WalletOption) => {
     if (!option.connect) {
@@ -49,18 +63,21 @@ export function WalletModal({ open, onOpenChange, onConnected }: WalletModalProp
         <DialogHeader className="text-center">
           <DialogTitle className="font-display text-foreground">Log in or sign up</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Connect a Solana or EVM wallet to call it.
+            Choose how you want to call it.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-2.5 pb-1">
+          <button disabled={pending} onClick={onGoogle} className={ROW}>
+            <span className="bg-background border-border flex size-9 shrink-0 items-center justify-center rounded-lg border">
+              <Mail className="size-4" />
+            </span>
+            <span className="text-foreground flex-1 font-semibold">Continue with Google</span>
+            <span className="text-lime text-xs">Fastest</span>
+          </button>
+
           {wallets.map((option) => (
-            <button
-              key={option.id}
-              disabled={connect.isPending}
-              onClick={() => pick(option)}
-              className="border-border bg-background hover:border-lime/50 flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors disabled:opacity-60"
-            >
+            <button key={option.id} disabled={pending} onClick={() => pick(option)} className={ROW}>
               <WalletLogo id={option.id} />
               <span className="text-foreground flex-1 font-semibold">{option.label}</span>
               {option.installed ? (
@@ -72,6 +89,31 @@ export function WalletModal({ open, onOpenChange, onConnected }: WalletModalProp
               )}
             </button>
           ))}
+
+          <div className="text-muted-foreground flex items-center gap-3 py-1 text-xs">
+            <span className="border-border flex-1 border-t" />
+            or
+            <span className="border-border flex-1 border-t" />
+          </div>
+
+          <button
+            disabled={pending}
+            onClick={() => {
+              onOpenChange(false);
+              onCreateNew();
+            }}
+            className={ROW}
+          >
+            <span className="bg-background border-border flex size-9 shrink-0 items-center justify-center rounded-lg border">
+              <Wallet className="text-lime size-4" />
+            </span>
+            <span className="text-foreground flex-1 font-semibold">Create a new Solana wallet</span>
+            <span className="text-muted-foreground text-xs">No install needed</span>
+          </button>
+
+          <p className="text-muted-foreground pt-1 text-center text-[11px]">
+            By continuing you agree to the Terms and confirm you are 18+.
+          </p>
         </div>
       </DialogContent>
     </Dialog>

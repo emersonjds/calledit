@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Mail, Wallet } from 'lucide-react';
+import { Check, Link2 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { CreateWalletSheet } from '@/widgets/create-wallet-sheet';
 import { WalletModal } from '@/widgets/wallet-modal';
@@ -52,7 +52,7 @@ export function OnboardingPage() {
 
   return (
     <div className="bg-background flex min-h-dvh w-full max-w-[430px] flex-col items-center justify-between px-6 py-14 text-center">
-      <div className="flex flex-1 flex-col items-center justify-center gap-8">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6">
         <div className="border-lime glow-lime relative flex size-32 items-center justify-center rounded-full border-2">
           <Check className="text-lime size-16" strokeWidth={3} />
         </div>
@@ -64,64 +64,57 @@ export function OnboardingPage() {
             Prove you called <span className="text-lime italic">it</span> first.
           </p>
           <p className="text-muted-foreground mx-auto max-w-xs text-sm">
-            Commit a prediction before it happens. It gets stamped on-chain. Nobody can fake a call.
+            Every call is stamped on-chain — no one can fake being first.
           </p>
+          <span className="border-lime/40 text-lime inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-xs">
+            <Link2 className="size-3" /> Solana-verified
+          </span>
         </div>
       </div>
 
-      <div className="w-full space-y-3">
+      <div className="w-full space-y-4">
         <Button
           size="lg"
           disabled={connect.isPending || busy}
-          onClick={enterWithGoogle}
-          className="bg-foreground text-background hover:bg-foreground/90 h-14 w-full text-base font-bold"
-        >
-          <Mail className="size-5" /> Continue with Google
-        </Button>
-        <Button
-          size="lg"
-          disabled={connect.isPending}
           onClick={() => setWalletOpen(true)}
           className="bg-lime text-background hover:bg-lime/90 h-14 w-full text-base font-bold"
         >
-          <Wallet className="size-5" /> Connect a wallet
+          Log in or sign up
         </Button>
-        <Button
-          variant="outline"
-          disabled={connect.isPending}
-          onClick={() => setCreateOpen(true)}
-          className="border-border h-12 w-full"
-        >
-          Create a Solana wallet
-        </Button>
-        <Button
-          size="lg"
-          variant="ghost"
-          disabled={connect.isPending}
-          onClick={() => enter('guest')}
-          className="text-muted-foreground h-12 w-full"
-        >
-          Play as guest
-        </Button>
-        <Button
-          size="lg"
-          variant="ghost"
-          disabled={connect.isPending || busy}
-          onClick={enterDemo}
-          className="text-flame h-11 w-full text-sm"
-        >
-          Enter as demo (simulated)
-        </Button>
-        <p className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-1.5 pt-2 text-xs">
+
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <button
+            disabled={connect.isPending || busy}
+            onClick={() => enter('guest')}
+            className="text-muted-foreground hover:text-foreground px-2 py-3 disabled:opacity-60"
+          >
+            Continue as guest
+          </button>
+          <span className="text-muted-foreground/40">·</span>
+          <button
+            disabled={connect.isPending || busy}
+            onClick={enterDemo}
+            className="text-flame/90 hover:text-flame px-2 py-3 disabled:opacity-60"
+          >
+            Try the demo
+          </button>
+        </div>
+
+        <p className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-1.5 text-xs">
           <img src="/solana.png" alt="Solana" className="size-3.5" />
-          <span>
-            Secured by Solana · By connecting you agree to the Terms and confirm you are over 18.
-          </span>
+          <span>Secured by Solana · Terms apply · 18+</span>
         </p>
       </div>
 
       <CreateWalletSheet open={createOpen} onOpenChange={setCreateOpen} onConnected={goHome} />
-      <WalletModal open={walletOpen} onOpenChange={setWalletOpen} onConnected={goHome} />
+      <WalletModal
+        open={walletOpen}
+        onOpenChange={setWalletOpen}
+        onConnected={goHome}
+        onGoogle={enterWithGoogle}
+        onCreateNew={() => setCreateOpen(true)}
+        busy={busy}
+      />
     </div>
   );
 }
