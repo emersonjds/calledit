@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Link2, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -22,7 +22,10 @@ export function OnboardingPage() {
 
   const goHome = () => navigate('/', { replace: true });
 
-  const enter = (provider: string) => connect.mutate({ provider }, { onSuccess: goHome });
+  // A fresh landing is always live (fetch real data); only "Try the demo" opts into the simulated sandbox.
+  useEffect(() => {
+    setMode('live');
+  }, [setMode]);
 
   // Demo: switch to simulated mode, boot MSW, then enter the app as a guest — no reload.
   const enterDemo = async () => {
@@ -101,15 +104,6 @@ export function OnboardingPage() {
           >
             <Zap className="size-4" aria-hidden="true" />
             Try the demo
-          </button>
-
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => enter('guest')}
-            className="text-foreground/90 hover:text-foreground focus-visible:ring-ring/50 mx-auto flex h-11 touch-manipulation items-center justify-center rounded-md px-4 text-sm font-medium underline-offset-4 outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
-          >
-            Continue as guest
           </button>
         </div>
 
