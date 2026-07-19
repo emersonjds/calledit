@@ -34,13 +34,15 @@ export function WalletModal({
 }: WalletModalProps) {
   const connect = useConnectWallet();
   const [wallets] = useState<WalletOption[]>(detectWallets);
-  const pending = connect.isPending || busy;
+  const [connecting, setConnecting] = useState(false);
+  const pending = connecting || connect.isPending || busy;
 
   const pick = async (option: WalletOption) => {
     if (!option.connect) {
       window.open(option.installLink, '_blank', 'noopener');
       return;
     }
+    setConnecting(true);
     try {
       const address = await option.connect();
       connect.mutate(
@@ -52,8 +54,20 @@ export function WalletModal({
           },
         },
       );
-    } catch {
-      toast.error(`${option.label} connection was rejected`);
+    } catch (error) {
+      // Phantom/MetaMask signal a real user-rejection with code 4001; anything else is a genuine failure.
+      const code =
+        typeof error === 'object' && error !== null ? Reflect.get(error, 'code') : undefined;
+      if (code === 4001) {
+        toast.error(`${option.label} connection was rejected`);
+        return;
+      }
+      const message =
+        error instanceof Error ? error.message : `Could not connect to ${option.label}`;
+      console.error(`${option.label} connect failed`, error);
+      toast.error(message);
+    } finally {
+      setConnecting(false);
     }
   };
 
