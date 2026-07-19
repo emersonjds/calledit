@@ -1,6 +1,6 @@
 import type { Prediction } from '@/entities/prediction';
 import type { MatchEventType, TeamInfo } from '@/entities/match';
-import type { Fixture } from '@/entities/fixture';
+import type { MatchCard } from '@/entities/fixture';
 import type { WalletActivity, WalletOverview } from '@/entities/wallet';
 import {
   FIAT_CURRENCY,
@@ -200,53 +200,62 @@ export function allLedgers(): AddressLedger[] {
 
 const T = (code: string, name: string, flag: string): TeamInfo => ({ code, name, flag });
 
-/** Next World Cup knockout fixtures — kickoff derived from now so the list stays "upcoming". */
-const FIXTURE_PLAN: Array<Omit<Fixture, 'id' | 'kickoff'> & { offsetHours: number }> = [
-  {
-    home: T('BRA', 'Brazil', '🇧🇷'),
-    away: T('FRA', 'France', '🇫🇷'),
-    stage: 'Semi-final',
-    venue: 'MetLife Stadium',
-    offsetHours: 5,
-  },
+interface RecentPlan {
+  home: TeamInfo;
+  away: TeamInfo;
+  score: [number, number];
+  stage: string;
+  venue: string;
+  hoursAgo: number;
+}
+
+/** Recently finished World Cup matches — final scores, played time derived from now. */
+const RECENT_PLAN: RecentPlan[] = [
   {
     home: T('ARG', 'Argentina', '🇦🇷'),
-    away: T('ESP', 'Spain', '🇪🇸'),
-    stage: 'Semi-final',
-    venue: 'SoFi Stadium',
-    offsetHours: 29,
+    away: T('CRO', 'Croatia', '🇭🇷'),
+    score: [3, 0],
+    stage: 'Quarter-final',
+    venue: 'Lusail Stadium',
+    hoursAgo: 22,
   },
   {
-    home: T('POR', 'Portugal', '🇵🇹'),
-    away: T('NED', 'Netherlands', '🇳🇱'),
-    stage: 'Third place',
-    venue: 'AT&T Stadium',
-    offsetHours: 51,
+    home: T('ESP', 'Spain', '🇪🇸'),
+    away: T('GER', 'Germany', '🇩🇪'),
+    score: [2, 1],
+    stage: 'Quarter-final',
+    venue: 'SoFi Stadium',
+    hoursAgo: 26,
+  },
+  {
+    home: T('FRA', 'France', '🇫🇷'),
+    away: T('POR', 'Portugal', '🇵🇹'),
+    score: [1, 1],
+    stage: 'Quarter-final',
+    venue: 'MetLife Stadium',
+    hoursAgo: 46,
   },
   {
     home: T('BRA', 'Brazil', '🇧🇷'),
-    away: T('ARG', 'Argentina', '🇦🇷'),
-    stage: 'Final',
-    venue: 'Estadio Azteca',
-    offsetHours: 75,
-  },
-  {
-    home: T('GER', 'Germany', '🇩🇪'),
-    away: T('MEX', 'Mexico', '🇲🇽'),
-    stage: 'Friendly',
-    venue: 'Mercedes-Benz Stadium',
-    offsetHours: 99,
+    away: T('NED', 'Netherlands', '🇳🇱'),
+    score: [4, 2],
+    stage: 'Quarter-final',
+    venue: 'AT&T Stadium',
+    hoursAgo: 50,
   },
 ];
 
-export function upcomingFixtures(): Fixture[] {
+export function recentMatches(): MatchCard[] {
   const now = Date.now();
-  return FIXTURE_PLAN.map((plan, index) => ({
-    id: `fx-${index}`,
+  return RECENT_PLAN.map((plan, index) => ({
+    id: `rc-${index}`,
     home: plan.home,
     away: plan.away,
+    score: plan.score,
+    status: 'finished',
+    clockMin: MATCH_FULL_MIN,
+    playedAt: now - plan.hoursAgo * 3_600_000,
     stage: plan.stage,
     venue: plan.venue,
-    kickoff: now + plan.offsetHours * 3_600_000,
   }));
 }

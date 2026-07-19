@@ -39,11 +39,3 @@ export function formatKickoff(kickoffMs: number): string {
     minute: '2-digit',
   }).format(new Date(kickoffMs));
 }
-
-/** "in 5h" / "in 2d" until a future timestamp. */
-export function formatCountdown(targetMs: number, nowMs: number): string {
-  const diffMin = Math.max(0, Math.round((targetMs - nowMs) / 60_000));
-  if (diffMin < 60) return `in ${diffMin}m`;
-  if (diffMin < 1440) return `in ${Math.round(diffMin / 60)}h`;
-  return `in ${Math.round(diffMin / 1440)}d`;
-}

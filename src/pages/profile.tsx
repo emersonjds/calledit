@@ -1,27 +1,23 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Copy, Flame, LogOut, ShieldCheck, Trophy } from 'lucide-react';
+import { ChevronRight, Copy, Flame, LogOut, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { DataNote } from '@/shared/ui/data-note';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
-import { Switch } from '@/shared/ui/switch';
 import { Button } from '@/shared/ui/button';
 import { formatSol, shortAddress } from '@/shared/lib/format';
 import { getMode, isDemo } from '@/shared/config';
-import { useProfile, useHistory } from '@/features/profile';
+import { useProfile } from '@/features/profile';
 import { useOnchainBalance } from '@/features/wallet';
 import { useSession } from '@/store/session';
-import { CallRow } from './history';
 
 export function ProfilePage() {
   const profile = useProfile();
-  const history = useHistory();
   const address = useSession((state) => state.address);
   const chain = useSession((state) => state.chain);
   const disconnect = useSession((state) => state.disconnect);
   const me = profile.data;
   const demo = getMode() === 'demo';
-  const recent = (history.data ?? []).slice(0, 3);
 
   const showOnchainBalance = chain === 'solana' && !isDemo();
   const onchainBalance = useOnchainBalance(address, showOnchainBalance);
@@ -63,12 +59,12 @@ export function ProfilePage() {
       </header>
 
       <Section label="Solana wallet">
-        <div className="border-border bg-card flex items-center justify-between gap-3 rounded-xl border px-4 py-3">
+        <div className="border-lime/30 bg-card flex items-center justify-between gap-3 rounded-xl border px-4 py-4">
           <div className="min-w-0">
-            <p className="text-foreground font-mono text-sm">
+            <p className="text-lime font-mono text-2xl font-extrabold">{walletBalanceLabel}</p>
+            <p className="text-muted-foreground font-mono text-xs">
               {address ? shortAddress(address) : '—'}
             </p>
-            <p className="text-muted-foreground text-xs">{walletBalanceLabel}</p>
           </div>
           <Button
             size="icon"
@@ -86,43 +82,14 @@ export function ProfilePage() {
         <div className="grid grid-cols-2 gap-3">
           <StatCard label="Accuracy" value={`${Math.round((me?.accuracy ?? 0) * 100)}%`} accent />
           <StatCard label="Calls won" value={`${me?.wonCalls ?? 0}/${me?.totalCalls ?? 0}`} />
-          <StatCard label="Global rank" value={`#${me?.rank ?? '—'}`} />
-          <StatCard label="Best streak" value={`${me?.bestStreak ?? 0} wins`} />
         </div>
         {getMode() === 'live' && (
           <DataNote>Stats are placeholder backend values, not yet computed.</DataNote>
         )}
       </Section>
 
-      <Section
-        label="Recent calls"
-        action={
-          (history.data?.length ?? 0) > 3 ? (
-            <Link to="/history" className="text-lime text-xs">
-              View all →
-            </Link>
-          ) : undefined
-        }
-      >
-        <div className="space-y-2">
-          {recent.length ? (
-            recent.map((prediction) => <CallRow key={prediction.id} prediction={prediction} />)
-          ) : (
-            <p className="text-muted-foreground bg-card border-border rounded-xl border px-4 py-6 text-center text-sm">
-              No calls yet — make your first one.
-            </p>
-          )}
-        </div>
-      </Section>
-
-      <Section label="Settings">
+      <Section label="More">
         <div className="border-border bg-card divide-border divide-y rounded-xl border">
-          <SettingRow title="Copy my calls" hint="Let followers mirror your predictions">
-            <Switch />
-          </SettingRow>
-          <SettingRow title="Goal alerts" hint="Notify me when a challenge opens">
-            <Switch defaultChecked />
-          </SettingRow>
           <Link
             to="/leaderboard"
             className="hover:bg-background/40 flex items-center gap-3 px-4 py-3 transition-colors"
@@ -141,53 +108,18 @@ export function ProfilePage() {
           <LogOut className="size-4" /> Sign out
         </Button>
       </Section>
-
-      <div className="text-lime flex items-center justify-center gap-2 pt-1 text-center text-[10px] font-semibold tracking-widest">
-        <ShieldCheck className="size-4 shrink-0" /> UNFORGEABLE · VERIFIED ON-CHAIN
-      </div>
     </div>
   );
 }
 
-function Section({
-  label,
-  action,
-  children,
-}: {
-  label: string;
-  action?: ReactNode;
-  children: ReactNode;
-}) {
+function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section className="space-y-2">
-      <div className="flex items-center justify-between px-1">
-        <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
-          {label}
-        </p>
-        {action}
-      </div>
+      <p className="text-muted-foreground px-1 text-[10px] font-semibold tracking-widest uppercase">
+        {label}
+      </p>
       {children}
     </section>
-  );
-}
-
-function SettingRow({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3">
-      <div className="min-w-0">
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-muted-foreground text-xs">{hint}</p>
-      </div>
-      {children}
-    </div>
   );
 }
 
