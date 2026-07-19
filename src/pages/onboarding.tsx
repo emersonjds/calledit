@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Check, Mail, Wallet } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { CreateWalletSheet } from '@/widgets/create-wallet-sheet';
+import { WalletModal } from '@/widgets/wallet-modal';
 import { useConnectWallet } from '@/features/wallet';
 import { useAppMode } from '@/store/app-mode';
 import {
@@ -16,6 +17,7 @@ export function OnboardingPage() {
   const connect = useConnectWallet();
   const enterDemo = useAppMode((state) => state.enterDemo);
   const [createOpen, setCreateOpen] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const goHome = () => navigate('/', { replace: true });
@@ -69,29 +71,19 @@ export function OnboardingPage() {
         <Button
           size="lg"
           disabled={connect.isPending}
-          onClick={() => enter('phantom')}
+          onClick={() => setWalletOpen(true)}
           className="bg-lime text-background hover:bg-lime/90 h-14 w-full text-base font-bold"
         >
-          <Wallet className="size-5" /> Connect Phantom
+          <Wallet className="size-5" /> Connect a wallet
         </Button>
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            disabled={connect.isPending}
-            onClick={() => enter('metamask')}
-            className="border-border h-12"
-          >
-            MetaMask
-          </Button>
-          <Button
-            variant="outline"
-            disabled={connect.isPending}
-            onClick={() => setCreateOpen(true)}
-            className="border-border h-12"
-          >
-            Create wallet
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          disabled={connect.isPending}
+          onClick={() => setCreateOpen(true)}
+          className="border-border h-12 w-full"
+        >
+          Create a Solana wallet
+        </Button>
         <Button
           size="lg"
           variant="ghost"
@@ -115,6 +107,7 @@ export function OnboardingPage() {
       </div>
 
       <CreateWalletSheet open={createOpen} onOpenChange={setCreateOpen} onConnected={goHome} />
+      <WalletModal open={walletOpen} onOpenChange={setWalletOpen} onConnected={goHome} />
     </div>
   );
 }
