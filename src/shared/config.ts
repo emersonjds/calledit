@@ -2,8 +2,9 @@ export type AppMode = 'live' | 'demo';
 
 const MODE_KEY = 'called-it:mode';
 
-export const API_BASE_URL: string =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api';
+// No VITE_API_BASE_URL set → the real backend isn't wired yet, so MSW serves '/api' on this origin.
+export const hasRealBackend: boolean = Boolean(import.meta.env.VITE_API_BASE_URL);
+export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 // Devnet by default to match the app's settlement cluster. Override via VITE_SOLANA_RPC_URL
 // (e.g. mainnet-beta) — never hardcode mainnet here.
