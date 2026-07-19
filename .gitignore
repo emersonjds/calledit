@@ -32,3 +32,6 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+
+# internal working docs (pitch deck, specs, reports) — kept local, out of the repo
+docs/
