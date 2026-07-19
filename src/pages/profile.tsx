@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Trophy } from 'lucide-react';
+import { DataNote } from '@/shared/ui/data-note';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Switch } from '@/shared/ui/switch';
 import { Button } from '@/shared/ui/button';
@@ -17,6 +18,7 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-4 px-4 py-4">
+      <DataNote>Profile stats are placeholder backend values, not yet computed.</DataNote>
       <div className="flex items-center gap-3">
         <Avatar className="border-lime size-14 border-2">
           <AvatarImage src="https://i.pravatar.cc/150?img=68" alt={me?.handle ?? 'You'} />

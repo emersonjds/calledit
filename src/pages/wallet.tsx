@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DataNote } from '@/shared/ui/data-note';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
@@ -44,6 +45,7 @@ export function WalletPage() {
 
   return (
     <div className="space-y-4 px-4 py-4">
+      <DataNote>Balance and activity are placeholder backend values in live mode.</DataNote>
       <div className="flex items-center gap-2">
         <button
           type="button"

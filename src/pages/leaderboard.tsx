@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Flame } from 'lucide-react';
+import { DataNote } from '@/shared/ui/data-note';
 import { cn } from '@/shared/lib/utils';
 import { useLeaderboard } from '@/features/profile';
 
@@ -9,6 +10,7 @@ export function LeaderboardPage() {
 
   return (
     <div className="space-y-3 px-4 py-4">
+      <DataNote>Leaderboard is placeholder backend data in live mode.</DataNote>
       <div className="flex items-center gap-2">
         <Link to="/profile" className="text-muted-foreground">
           <ArrowLeft className="size-5" />
