@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from '@/shared/ui/sonner';
 import { router } from '@/app/router';
+import { isDemo } from '@/shared/config';
 import '@/index.css';
 
 const queryClient = new QueryClient({
@@ -11,7 +12,7 @@ const queryClient = new QueryClient({
 });
 
 async function bootstrap() {
-  if (import.meta.env.DEV || import.meta.env.VITE_ENABLE_MOCKS !== 'false') {
+  if (isDemo()) {
     const { startMockServer } = await import('@/mocks/browser');
     await startMockServer();
   }

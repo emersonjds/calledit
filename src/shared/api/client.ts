@@ -15,8 +15,10 @@ import {
   type ProfileDto,
 } from './schemas';
 import type { z } from 'zod';
+import { API_BASE_URL, isDemo } from '@/shared/config';
 
-const BASE = '/api';
+// Demo → MSW-intercepted '/api'; live → real calledit-api.
+const BASE = isDemo() ? '/api' : API_BASE_URL;
 
 async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

@@ -9,7 +9,8 @@ export function useConnectWallet() {
   return useMutation({
     mutationFn: ({ provider, address }: { provider: string; address?: string }) =>
       api.connectWallet(provider, address),
-    onSuccess: (account) => connect(account),
+    // In live mode the backend echoes a stub address; if the caller supplied a real one, keep it.
+    onSuccess: (account, { address }) => connect(address ? { ...account, address } : account),
   });
 }
 
