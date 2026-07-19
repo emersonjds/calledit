@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { MarketId } from '@/entities/prediction';
 import type { ChainKind, WalletAccount } from '@/entities/wallet';
 import { DEMO_MATCH_ID } from '@/mocks/config';
@@ -18,35 +17,24 @@ interface SessionState {
   setActivePrediction: (id: string | null) => void;
 }
 
-export const useSession = create<SessionState>()(
-  persist(
-    (set) => ({
-      address: null,
-      provider: null,
-      chain: null,
-      matchId: isDemo() ? DEMO_MATCH_ID : LIVE_MATCH_ID,
-      selectedMarket: null,
-      activePredictionId: null,
-      connect: (account) =>
-        set({
-          address: account.address,
-          provider: account.provider,
-          chain: account.chain,
-        }),
-      disconnect: () =>
-        set({ address: null, provider: null, chain: null, activePredictionId: null }),
-      selectMarket: (market) => set({ selectedMarket: market }),
-      setActivePrediction: (id) => set({ activePredictionId: id }),
+// Session is in-memory only: every entry starts at the onboarding landing (log in / guest / demo),
+// never auto-resumed from a previous connection.
+export const useSession = create<SessionState>((set) => ({
+  address: null,
+  provider: null,
+  chain: null,
+  matchId: isDemo() ? DEMO_MATCH_ID : LIVE_MATCH_ID,
+  selectedMarket: null,
+  activePredictionId: null,
+  connect: (account) =>
+    set({
+      address: account.address,
+      provider: account.provider,
+      chain: account.chain,
     }),
-    {
-      name: 'called-it:session',
-      partialize: (state) => ({
-        address: state.address,
-        provider: state.provider,
-        chain: state.chain,
-      }),
-    },
-  ),
-);
+  disconnect: () => set({ address: null, provider: null, chain: null, activePredictionId: null }),
+  selectMarket: (market) => set({ selectedMarket: market }),
+  setActivePrediction: (id) => set({ activePredictionId: id }),
+}));
 
 export const useIsConnected = () => useSession((state) => state.address !== null);
