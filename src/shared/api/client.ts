@@ -17,11 +17,12 @@ import {
 import type { z } from 'zod';
 import { API_BASE_URL, isDemo } from '@/shared/config';
 
+// Resolved per request so switching to demo mode at runtime takes effect without a reload.
 // Demo → MSW-intercepted '/api'; live → real calledit-api.
-const BASE = isDemo() ? '/api' : API_BASE_URL;
+const baseUrl = (): string => (isDemo() ? '/api' : API_BASE_URL);
 
 async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${baseUrl()}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...init,
   });

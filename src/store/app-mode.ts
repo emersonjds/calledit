@@ -1,23 +1,23 @@
 import { create } from 'zustand';
 import { getMode, persistMode, type AppMode } from '@/shared/config';
+import { useSession } from '@/store/session';
 
 interface AppModeState {
   mode: AppMode;
-  enterDemo: () => void;
+  setMode: (mode: AppMode) => void;
   exitDemo: () => void;
 }
 
-// enterDemo/exitDemo persist then reload, so bootstrap re-runs and MSW starts/stops cleanly.
 export const useAppMode = create<AppModeState>((set) => ({
   mode: getMode(),
-  enterDemo: () => {
-    persistMode('demo');
-    set({ mode: 'demo' });
-    window.location.assign('/onboarding');
+  setMode: (mode) => {
+    persistMode(mode);
+    set({ mode });
   },
+  // Leaving demo drops the simulated session and reloads so MSW stops intercepting.
   exitDemo: () => {
     persistMode('live');
-    set({ mode: 'live' });
+    useSession.getState().disconnect();
     window.location.assign('/onboarding');
   },
 }));

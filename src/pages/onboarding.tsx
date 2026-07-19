@@ -15,7 +15,7 @@ import {
 export function OnboardingPage() {
   const navigate = useNavigate();
   const connect = useConnectWallet();
-  const enterDemo = useAppMode((state) => state.enterDemo);
+  const setMode = useAppMode((state) => state.setMode);
   const [createOpen, setCreateOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -23,6 +23,16 @@ export function OnboardingPage() {
   const goHome = () => navigate('/', { replace: true });
 
   const enter = (provider: string) => connect.mutate({ provider }, { onSuccess: goHome });
+
+  // Demo: switch to simulated mode, boot MSW, then enter the app as a guest — no reload.
+  const enterDemo = async () => {
+    if (busy) return;
+    setBusy(true);
+    setMode('demo');
+    const { startMockServer } = await import('@/mocks/browser');
+    await startMockServer();
+    connect.mutate({ provider: 'guest' }, { onSuccess: goHome, onSettled: () => setBusy(false) });
+  };
 
   // Google here is a simulated OAuth backed by the same embedded wallet (real SDK swap is the deferred step).
   const enterWithGoogle = async () => {
@@ -96,6 +106,7 @@ export function OnboardingPage() {
         <Button
           size="lg"
           variant="ghost"
+          disabled={connect.isPending || busy}
           onClick={enterDemo}
           className="text-flame h-11 w-full text-sm"
         >
