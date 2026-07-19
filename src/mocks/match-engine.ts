@@ -9,48 +9,75 @@ import type {
 } from '@/entities/match';
 import { MARKET_LIST } from '@/entities/prediction';
 import { AWAY_TEAM, DEMO_MATCH_ID, HOME_TEAM, MATCH_FULL_MIN, MATCH_MIN_PER_SEC } from './config';
-import { mulberry32 } from './prng';
 
-const HOME_PLAYERS = ['Vinícius Jr', 'Rodrygo', 'Raphinha', 'Bruno G.', 'Casemiro'];
-const AWAY_PLAYERS = ['Mbappé', 'Griezmann', 'Dembélé', 'Tchouaméni', 'Saliba'];
+const HOME_PLAYERS = [
+  'Harry Kane',
+  'Jude Bellingham',
+  'Bukayo Saka',
+  'Phil Foden',
+  'Marcus Rashford',
+];
+const AWAY_PLAYERS = [
+  'Kylian Mbappé',
+  'Antoine Griezmann',
+  'Ousmane Dembélé',
+  'Aurélien Tchouaméni',
+  'Olivier Giroud',
+];
 
 interface ScheduledEvent extends MatchEvent {
   clockMin: number;
 }
 
-/** Poisson-ish placement of a stat across the match, seeded for reproducibility. */
-function place(
-  rng: () => number,
-  type: MatchEventType,
-  count: number,
-  minMinute: number,
-): ScheduledEvent[] {
-  const out: ScheduledEvent[] = [];
-  for (let i = 0; i < count; i++) {
-    const clockMin = Math.floor(minMinute + rng() * (MATCH_FULL_MIN - minMinute));
-    const side: TeamSide = rng() > 0.5 ? 'home' : 'away';
+/** Fixed [minute, side, playerIndex] scoring line for a 6-4 England(home)–France(away) match. */
+const GOALS: ReadonlyArray<[number, TeamSide, number]> = [
+  [4, 'home', 0],
+  [9, 'away', 0],
+  [17, 'home', 1],
+  [23, 'home', 2],
+  [31, 'away', 1],
+  [38, 'home', 3],
+  [52, 'away', 2],
+  [61, 'home', 0],
+  [74, 'home', 4],
+  [83, 'away', 4],
+];
+
+const YELLOWS: ReadonlyArray<[number, TeamSide, number]> = [
+  [27, 'away', 3],
+  [44, 'home', 1],
+  [69, 'away', 3],
+];
+
+/**
+ * Deterministic scripted timeline — identical every run so the demo reliably shows wins on camera.
+ * Corners are packed every 3' (< the 4' corner window) so a corner call always resolves to a win.
+ */
+export function buildSchedule(): ScheduledEvent[] {
+  const events: ScheduledEvent[] = [];
+  const add = (type: MatchEventType, side: TeamSide, clockMin: number, playerIdx: number) => {
     const players = side === 'home' ? HOME_PLAYERS : AWAY_PLAYERS;
-    out.push({
-      id: `${type}-${i}-${clockMin}`,
+    events.push({
+      id: `${type}-${side}-${clockMin}`,
       type,
       side,
       clockMin,
-      player: players[Math.floor(rng() * players.length)],
+      player: players[playerIdx % players.length],
     });
-  }
-  return out;
-}
+  };
 
-/** Full deterministic event timeline for a match seed. */
-export function buildSchedule(seed: number): ScheduledEvent[] {
-  const rng = mulberry32(seed);
-  const events = [
-    ...place(rng, 'goal', 2 + Math.floor(rng() * 3), 4),
-    ...place(rng, 'yellow', 3 + Math.floor(rng() * 3), 8),
-    ...place(rng, 'red', rng() > 0.75 ? 1 : 0, 55),
-    ...place(rng, 'corner', 8 + Math.floor(rng() * 5), 3),
-    ...place(rng, 'foul', 14 + Math.floor(rng() * 8), 2),
-  ];
+  for (const [clockMin, side, idx] of GOALS) add('goal', side, clockMin, idx);
+  for (const [clockMin, side, idx] of YELLOWS) add('yellow', side, clockMin, idx);
+
+  let index = 0;
+  for (let clockMin = 3; clockMin <= 87; clockMin += 3) {
+    add('corner', index % 2 === 0 ? 'home' : 'away', clockMin, index);
+    index += 1;
+  }
+  for (let clockMin = 6; clockMin <= 84; clockMin += 6) {
+    add('foul', (clockMin / 6) % 2 === 0 ? 'home' : 'away', clockMin, clockMin);
+  }
+
   return events.sort((a, b) => a.clockMin - b.clockMin);
 }
 
@@ -106,8 +133,8 @@ export interface EngineInput {
   elapsedSec: number;
 }
 
-export function snapshotAt({ seed, elapsedSec }: EngineInput): MatchSnapshot {
-  const schedule = buildSchedule(seed);
+export function snapshotAt({ elapsedSec }: EngineInput): MatchSnapshot {
+  const schedule = buildSchedule();
   const clockMin = Math.min(MATCH_FULL_MIN, clockFromElapsed(elapsedSec));
   const period = periodFor(clockMin);
   const score = scoreAt(schedule, clockMin);
@@ -132,12 +159,11 @@ export function snapshotAt({ seed, elapsedSec }: EngineInput): MatchSnapshot {
 
 /** Does an event of `type` occur strictly after `fromMin` and within `windowMin`? */
 export function findResolvingEvent(
-  seed: number,
   type: MatchEventType,
   fromMin: number,
   windowMin: number,
 ): MatchEvent | null {
-  const schedule = buildSchedule(seed);
+  const schedule = buildSchedule();
   return (
     schedule.find(
       (event) =>

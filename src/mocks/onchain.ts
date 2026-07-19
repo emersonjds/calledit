@@ -38,13 +38,12 @@ function resolvingTypes(market: MarketId): MatchEventType[] {
 }
 
 function earliestEvent(
-  seed: number,
   types: MatchEventType[],
   fromMin: number,
   windowMin: number,
 ): MatchEvent | null {
   const found = types
-    .map((type) => findResolvingEvent(seed, type, fromMin, windowMin))
+    .map((type) => findResolvingEvent(type, fromMin, windowMin))
     .filter((event): event is MatchEvent => event !== null)
     .sort((a, b) => a.clockMin - b.clockMin);
   return found[0] ?? null;
@@ -126,7 +125,6 @@ export function getPrediction(id: string): Prediction | null {
   }
 
   const event = earliestEvent(
-    record.seed,
     resolvingTypes(prediction.market),
     record.atClockMin,
     record.windowMin,

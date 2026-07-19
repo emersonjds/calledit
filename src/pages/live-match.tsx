@@ -31,7 +31,7 @@ export function LiveMatchPage() {
   const selectMarket = useSession((state) => state.selectMarket);
   const activePredictionId = useSession((state) => state.activePredictionId);
 
-  const [stake, setStake] = useState(1);
+  const [stake, setStake] = useState(0.05);
   const balance = profile.data?.balanceSol ?? 0;
   const streak = profile.data?.currentStreak ?? 0;
 
