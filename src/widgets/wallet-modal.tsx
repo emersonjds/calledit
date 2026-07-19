@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, Mail, Wallet } from 'lucide-react';
+import { ExternalLink, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -104,10 +104,8 @@ export function WalletModal({
             }}
             className={ROW}
           >
-            <span className="bg-background border-border flex size-9 shrink-0 items-center justify-center rounded-lg border">
-              <Wallet className="text-lime size-4" />
-            </span>
-            <span className="text-foreground flex-1 font-semibold">Create a new Solana wallet</span>
+            <img src="/solana.png" alt="Solana" className="size-9 shrink-0 rounded-lg" />
+            <span className="text-foreground flex-1 font-semibold">Create a new wallet</span>
             <span className="text-muted-foreground text-xs">No install needed</span>
           </button>
 
