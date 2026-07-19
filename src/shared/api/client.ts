@@ -1,9 +1,9 @@
 import type { MatchSnapshot } from '@/entities/match';
 import type { MarketId, Prediction } from '@/entities/prediction';
 import type { WalletAccount, WalletOverview } from '@/entities/wallet';
-import type { Fixture } from '@/entities/fixture';
+import type { MatchCard } from '@/entities/fixture';
 import {
-  fixturesSchema,
+  matchListSchema,
   historySchema,
   leaderboardSchema,
   matchSnapshotSchema,
@@ -98,9 +98,7 @@ export const api = {
     }) as Promise<WalletOverview>;
   },
 
-  getUpcomingFixtures(): Promise<Fixture[]> {
-    return request('/fixtures/upcoming', fixturesSchema).then(
-      (result) => result.items as Fixture[],
-    );
+  getMatches(): Promise<MatchCard[]> {
+    return request('/matches', matchListSchema).then((result) => result.items as MatchCard[]);
   },
 };

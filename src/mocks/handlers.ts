@@ -1,8 +1,9 @@
 import { http, HttpResponse, delay } from 'msw';
 import { isMarketId } from '@/entities/prediction';
 import type { WalletAccount, ChainKind } from '@/entities/wallet';
+import type { MatchCard } from '@/entities/fixture';
 import { snapshotAt } from './match-engine';
-import { deposit, getLedger, getMatch, upcomingFixtures, walletOverview, withdraw } from './state';
+import { deposit, getLedger, getMatch, recentMatches, walletOverview, withdraw } from './state';
 import { commit, getPrediction, leaderboard, profile } from './onchain';
 import { mulberry32, seedFromString } from './prng';
 
@@ -108,7 +109,19 @@ export const handlers = [
     return HttpResponse.json(result.wallet);
   }),
 
-  http.get('/api/fixtures/upcoming', () => {
-    return HttpResponse.json({ items: upcomingFixtures() });
+  http.get('/api/matches', () => {
+    const snap = snapshotAt(getMatch());
+    const live: MatchCard = {
+      id: snap.matchId,
+      home: snap.home,
+      away: snap.away,
+      score: snap.score,
+      status: 'live',
+      clockMin: snap.clockMin,
+      playedAt: Date.now(),
+      stage: 'Semi-final',
+      venue: 'MetLife Stadium',
+    };
+    return HttpResponse.json({ items: [live, ...recentMatches()] });
   }),
 ];

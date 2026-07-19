@@ -88,17 +88,20 @@ export const walletOverviewSchema = z.object({
   activity: z.array(walletActivitySchema),
 });
 
-export const fixtureSchema = z.object({
+export const matchCardSchema = z.object({
   id: z.string(),
   home: teamInfoSchema,
   away: teamInfoSchema,
-  kickoff: z.number(),
+  score: z.tuple([z.number(), z.number()]),
+  status: z.enum(['live', 'finished']),
+  clockMin: z.number(),
+  playedAt: z.number(),
   stage: z.string(),
   venue: z.string(),
 });
 
-export const fixturesSchema = z.object({
-  items: z.array(fixtureSchema),
+export const matchListSchema = z.object({
+  items: z.array(matchCardSchema),
 });
 
 export const profileSchema = z.object({
