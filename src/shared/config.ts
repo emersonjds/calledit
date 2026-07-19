@@ -11,6 +11,11 @@ export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api';
 export const SOLANA_RPC_URL: string =
   import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
 
+// Devnet treasury (service wallet) that receives real stake transfers. Must equal the backend's
+// service pubkey so verification doesn't drift. Override via VITE_TREASURY_ADDRESS.
+export const TREASURY_ADDRESS: string =
+  import.meta.env.VITE_TREASURY_ADDRESS ?? '2t5SHE9udJWswb5GqKMzvRhE836uyzkdkQJGf1sHhi8p';
+
 // The real TxLINE fixture the live match tracks by default (Spain vs Argentina). Override per event.
 export const LIVE_MATCH_ID: string = import.meta.env.VITE_LIVE_MATCH_ID ?? '18257739';
 
