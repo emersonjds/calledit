@@ -22,9 +22,9 @@ function chainFor(provider: string): ChainKind {
 
 export const handlers = [
   http.post('/api/wallet/connect', async ({ request }) => {
-    const body = (await request.json()) as { provider?: string };
+    const body = (await request.json()) as { provider?: string; address?: string };
     const provider = body.provider ?? 'guest';
-    const address = addressFor(provider);
+    const address = body.address ?? addressFor(provider);
     await delay(180);
     const account: WalletAccount = {
       address,

@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Hide scrollbars inside the device frame while keeping scroll behavior. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 /* Called It — dark-only brand theme (design tokens: Stadium Pulse) */
 :root {
   --radius: 0.85rem;

@@ -48,6 +48,11 @@ export function LiveMatchPage() {
 
   return (
     <div className="space-y-3 px-4 py-3">
+      <div className="text-muted-foreground mx-auto flex items-center justify-center gap-1.5 text-[10px]">
+        <span className="bg-lime size-1.5 animate-pulse rounded-full" />
+        Live odds &amp; stats powered by{' '}
+        <span className="text-foreground font-semibold">TxLINE</span>
+      </div>
       <div className="flex items-center justify-between">
         <span className="font-display text-lime text-lg font-extrabold tracking-tight">
           CALLED IT

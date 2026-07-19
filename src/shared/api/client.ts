@@ -15,11 +15,14 @@ import {
   type ProfileDto,
 } from './schemas';
 import type { z } from 'zod';
+import { API_BASE_URL, isDemo } from '@/shared/config';
 
-const BASE = '/api';
+// Resolved per request so switching to demo mode at runtime takes effect without a reload.
+// Demo → MSW-intercepted '/api'; live → real calledit-api.
+const baseUrl = (): string => (isDemo() ? '/api' : API_BASE_URL);
 
 async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${baseUrl()}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...init,
   });
@@ -38,10 +41,10 @@ export interface CommitPredictionInput {
 }
 
 export const api = {
-  connectWallet(provider: string): Promise<WalletAccount> {
+  connectWallet(provider: string, address?: string): Promise<WalletAccount> {
     return request('/wallet/connect', walletAccountSchema, {
       method: 'POST',
-      body: JSON.stringify({ provider }),
+      body: JSON.stringify({ provider, address }),
     }) as Promise<WalletAccount>;
   },
 
