@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DataNote } from '@/shared/ui/data-note';
 import { toast } from 'sonner';
 import { Wallet, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -49,9 +48,11 @@ export function LiveMatchPage() {
 
   return (
     <div className="space-y-3 px-4 py-3">
-      <DataNote>
-        Live feed shows placeholder teams until the TxLINE ingester maps the fixture.
-      </DataNote>
+      <div className="text-muted-foreground mx-auto flex items-center justify-center gap-1.5 text-[10px]">
+        <span className="bg-lime size-1.5 animate-pulse rounded-full" />
+        Live odds &amp; stats powered by{' '}
+        <span className="text-foreground font-semibold">TxLINE</span>
+      </div>
       <div className="flex items-center justify-between">
         <span className="font-display text-lime text-lg font-extrabold tracking-tight">
           CALLED IT
