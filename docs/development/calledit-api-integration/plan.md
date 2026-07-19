@@ -4,7 +4,7 @@
 
 **Goal:** Run the app against the real `calledit-api` (real TxODDS fixtures + real prediction persistence), keep an explicit demo mode (MSW), and revamp sign-in into a wallet modal (Phantom/Solflare/Backpack/MetaMask + Google/Create/guest/demo).
 
-**Architecture:** Env-driven live/demo switch. Live mode: `BASE=VITE_API_BASE_URL` (default `http://localhost:3000/api`), MSW never starts. Demo mode: `BASE=/api`, MSW simulation runs, "Simulated data" badge shows. Client owns the wallet address (backend `wallet/connect` is a stub). Design + real shapes: see `docs/superpowers/specs/2026-07-18-calledit-api-integration-design.md` and `scratchpad/calledit-api-contract.md`.
+**Architecture:** Env-driven live/demo switch. Live mode: `BASE=VITE_API_BASE_URL` (default `http://localhost:3000/api`), MSW never starts. Demo mode: `BASE=/api`, MSW simulation runs, "Simulated data" badge shows. Client owns the wallet address (backend `wallet/connect` is a stub). Design + real shapes: see [`./spec.md`](./spec.md).
 
 **Tech Stack:** Vite + React 19 + TS + Tailwind + shadcn/ui + Zustand + React Query + MSW + Vitest. Backend already proven running locally (real fixtures confirmed).
 
