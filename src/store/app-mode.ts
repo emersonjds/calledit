@@ -14,7 +14,6 @@ export const useAppMode = create<AppModeState>((set) => ({
     persistMode(mode);
     set({ mode });
   },
-  // Leaving demo drops the simulated session and reloads so MSW stops intercepting.
   exitDemo: () => {
     persistMode('live');
     useSession.getState().disconnect();

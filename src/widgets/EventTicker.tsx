@@ -30,7 +30,6 @@ export function EventTicker({ events }: EventTickerProps) {
     return <p className="text-muted-foreground px-4 py-2 text-xs">No events yet.</p>;
   }
 
-  // feed is chronological; the ticker reads newest-first
   const newestFirst = [...events].sort((a, b) => b.clockMin - a.clockMin);
 
   return (

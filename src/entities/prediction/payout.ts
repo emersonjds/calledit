@@ -1,4 +1,3 @@
-/** Consecutive wins raise the multiplier; a loss resets it. Skill, not luck. */
 export function streakBonus(currentStreak: number): number {
   if (currentStreak >= 5) return 2;
   if (currentStreak >= 3) return 1.5;
@@ -9,7 +8,6 @@ function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-/** Effective multiplier locked at commit: market base × streak bonus. */
 export function effectiveMultiplier(baseMultiplier: number, currentStreak: number): number {
   return round2(baseMultiplier * streakBonus(currentStreak));
 }

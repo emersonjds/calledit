@@ -1,4 +1,3 @@
-/** Deterministic PRNG (mulberry32) — reproducible match timelines from a seed. */
 export function mulberry32(seed: number): () => number {
   let state = seed >>> 0;
   return () => {

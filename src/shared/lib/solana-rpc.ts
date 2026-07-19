@@ -6,7 +6,6 @@ const balanceResponseSchema = z.object({
   result: z.object({ value: z.number() }),
 });
 
-/** Raw JSON-RPC call — no web3.js. Cluster is whatever `rpcUrl` points at (see SOLANA_RPC_URL). */
 export async function getSolBalance(address: string, rpcUrl: string): Promise<number> {
   const res = await fetch(rpcUrl, {
     method: 'POST',

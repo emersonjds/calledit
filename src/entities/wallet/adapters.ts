@@ -53,7 +53,6 @@ function evmConnect(provider: EvmProvider): () => Promise<string> {
   };
 }
 
-/** Reads injected wallet globals; pure w.r.t. the current window so it stays testable. */
 export function detectWallets(): WalletOption[] {
   const win: Window | undefined = typeof window !== 'undefined' ? window : undefined;
   const phantom = detectPhantom(win);

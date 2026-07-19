@@ -5,9 +5,9 @@ export type MatchEventType = 'goal' | 'yellow' | 'red' | 'corner' | 'foul' | 'su
 export type TeamSide = 'home' | 'away';
 
 export interface TeamInfo {
-  code: string; // e.g. "BRA"
-  name: string; // e.g. "Brazil"
-  flag: string; // emoji flag
+  code: string;
+  name: string;
+  flag: string;
 }
 
 export interface MatchEvent {
@@ -19,7 +19,6 @@ export interface MatchEvent {
   detail?: string;
 }
 
-/** Clean win probabilities from the feed's `Pct` (house margin already removed). Sum ≈ 1. */
 export interface WinProbability {
   home: number;
   draw: number;
@@ -39,7 +38,7 @@ export interface MatchSnapshot {
   away: TeamInfo;
   score: [number, number];
   pct: WinProbability;
-  events: MatchEvent[]; // chronological, up to the current clock
-  markets: MarketQuote[]; // live multipliers per market
+  events: MatchEvent[];
+  markets: MarketQuote[];
   live: boolean;
 }

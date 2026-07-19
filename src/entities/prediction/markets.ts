@@ -5,13 +5,10 @@ export type MarketId = 'corner' | 'card' | 'goal' | 'foul';
 export interface MarketDef {
   id: MarketId;
   label: string;
-  /** Event type in the rich feed that resolves this market. */
   eventType: MatchEventType;
   /** True only if backed by the 8 provable TxLINE keys (settles on-chain). */
   provable: boolean;
-  /** Provable stat base keys per team (empty when not provable). */
   keys: number[];
-  /** Base payout multiplier before the streak bonus. */
   baseMultiplier: number;
 }
 

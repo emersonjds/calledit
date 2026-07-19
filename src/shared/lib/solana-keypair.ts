@@ -3,7 +3,7 @@ const STORAGE_KEY = 'called-it:embedded-wallet';
 
 export interface EmbeddedWallet {
   address: string;
-  secret: string; // 64-byte Solana secret key (seed||pubkey), base58 — importable into a wallet
+  secret: string;
 }
 
 export function base58Encode(bytes: Uint8Array): string {
@@ -39,7 +39,6 @@ export async function createEmbeddedWallet(): Promise<EmbeddedWallet> {
   return { address: base58Encode(publicKey), secret: base58Encode(secretKey) };
 }
 
-// ponytail: hackathon custody — raw secret in localStorage. Swap this module for a KMS / Privy / Turnkey later.
 export function saveEmbeddedWallet(wallet: EmbeddedWallet): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(wallet));
 }

@@ -3,12 +3,9 @@ import { cn } from '@/shared/lib/utils';
 
 interface LogoProps {
   className?: string;
-  /** Smaller, tighter build for the topbar/nav. */
   compact?: boolean;
 }
 
-// The bolt stands in for the "I" in "IT" — same glyph as the CALL IT button,
-// scaled to the surrounding letters' cap height so it reads as a letterform.
 export function Logo({ className, compact = false }: LogoProps) {
   return (
     <span
@@ -32,7 +29,6 @@ export function Logo({ className, compact = false }: LogoProps) {
   );
 }
 
-// Standalone bolt — favicon / maskable app icon / anywhere the wordmark won't fit.
 export function LogoMark({ className }: { className?: string }) {
   return (
     <Zap

@@ -31,7 +31,6 @@ function base58(length: number): string {
   return out;
 }
 
-/** Card resolves on yellow OR red; other markets on their single event type. */
 function resolvingTypes(market: MarketId): MatchEventType[] {
   if (market === 'card') return ['yellow', 'red'];
   return [MARKETS[market].eventType];

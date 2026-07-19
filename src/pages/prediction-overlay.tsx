@@ -21,8 +21,6 @@ export function PredictionOverlay({ id }: { id: string }) {
     selectMarket(null);
   };
 
-  // LIVE settles in real wall-clock: windowMin is 5 REAL minutes. Demo compresses
-  // match-minutes into seconds via the mock engine's MATCH_MIN_PER_SEC.
   const total = prediction
     ? isDemo()
       ? Math.max(3, Math.round(prediction.windowMin / MATCH_MIN_PER_SEC))

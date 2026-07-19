@@ -29,7 +29,6 @@ interface ScheduledEvent extends MatchEvent {
   clockMin: number;
 }
 
-/** Fixed [minute, side, playerIndex] scoring line for a 6-4 England(home)–France(away) match. */
 const GOALS: ReadonlyArray<[number, TeamSide, number]> = [
   [4, 'home', 0],
   [9, 'away', 0],
@@ -49,10 +48,6 @@ const YELLOWS: ReadonlyArray<[number, TeamSide, number]> = [
   [69, 'away', 3],
 ];
 
-/**
- * Deterministic scripted timeline — identical every run so the demo reliably shows wins on camera.
- * Corners are packed every 3' (< the 4' corner window) so a corner call always resolves to a win.
- */
 export function buildSchedule(): ScheduledEvent[] {
   const events: ScheduledEvent[] = [];
   const add = (type: MatchEventType, side: TeamSide, clockMin: number, playerIdx: number) => {
@@ -101,10 +96,9 @@ function scoreAt(events: ScheduledEvent[], clockMin: number): [number, number] {
   return [home, away];
 }
 
-/** Clean win probability derived from score margin and time remaining (sums to 1). */
 function winProbability(score: [number, number], clockMin: number): WinProbability {
   const margin = score[0] - score[1];
-  const settled = Math.min(1, clockMin / 95); // late margins matter more
+  const settled = Math.min(1, clockMin / 95);
   const homeEdge = margin * (0.12 + settled * 0.22);
   let home = 0.4 + homeEdge;
   let away = 0.4 - homeEdge;
@@ -116,7 +110,6 @@ function winProbability(score: [number, number], clockMin: number): WinProbabili
 }
 
 function liveMultipliers(clockMin: number): MarketQuote[] {
-  // Slight, deterministic drift around each market's base so odds feel alive.
   const drift = Math.sin(clockMin / 7) * 0.3;
   return MARKET_LIST.map((market) => ({
     market: market.id,
@@ -157,7 +150,6 @@ export function snapshotAt({ elapsedSec }: EngineInput): MatchSnapshot {
   };
 }
 
-/** Does an event of `type` occur strictly after `fromMin` and within `windowMin`? */
 export function findResolvingEvent(
   type: MatchEventType,
   fromMin: number,

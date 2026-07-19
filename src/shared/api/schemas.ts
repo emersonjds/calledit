@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-/** Zod schemas validate every network boundary (the MSW↔real swap point). */
-
 export const teamInfoSchema = z.object({
   code: z.string(),
   name: z.string(),
@@ -34,7 +32,7 @@ export const fixtureSchema = z.object({
   id: z.string(),
   home: teamInfoSchema,
   away: teamInfoSchema,
-  kickoff: z.number(), // epoch ms — the only real source of a live match minute
+  kickoff: z.number(),
   stage: z.string(),
   venue: z.string(),
 });

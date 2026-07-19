@@ -10,15 +10,12 @@ import { detectPhantom } from '../../entities/wallet/adapters';
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
-// Plausible on-chain tx signature (64 bytes ≈ 88 base58 chars) for demo mode.
 function mockStakeSignature(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(88));
   return Array.from(bytes, (byte) => BASE58[byte % 58]).join('');
 }
 
-// Signs + sends a real devnet SOL transfer from the connected Phantom wallet to the treasury.
 export async function signStakeTransfer(from: string, sol: number): Promise<string> {
-  // Demo mode has no real wallet/RPC (and a placeholder guest pubkey): return a mock signature.
   if (isDemo()) return mockStakeSignature();
   const provider = detectPhantom(typeof window !== 'undefined' ? window : undefined);
   if (!provider?.signAndSendTransaction)

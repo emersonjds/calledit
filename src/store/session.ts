@@ -17,8 +17,6 @@ interface SessionState {
   setActivePrediction: (id: string | null) => void;
 }
 
-// Session is in-memory only: every entry starts at the onboarding landing (log in / guest / demo),
-// never auto-resumed from a previous connection.
 export const useSession = create<SessionState>((set) => ({
   address: null,
   provider: null,

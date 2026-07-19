@@ -44,7 +44,6 @@ export function LiveMatchPage() {
 
   const [stake, setStake] = useState(0.05);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  // Live mode shows the wallet's real on-chain devnet balance; demo uses the mock ledger.
   const onchainBalance = useOnchainBalance(address, !isDemo() && chain === 'solana');
   const balance =
     !isDemo() && onchainBalance.data !== undefined
@@ -52,8 +51,6 @@ export function LiveMatchPage() {
       : (profile.data?.balanceSol ?? 0);
   const streak = profile.data?.currentStreak ?? 0;
 
-  // LIVE mode has no feed clock — derive the minute from kickoff + wall-clock (re-read
-  // every 1s feed refetch). Demo keeps the compressed clock from the mock engine.
   const clockMin =
     !isDemo() && kickoff !== null ? liveMatchMinute(kickoff) : (feed.data?.clockMin ?? 0);
 
@@ -76,7 +73,6 @@ export function LiveMatchPage() {
 
   const call = () => {
     if (!selectedMarket) return;
-    // First call for a wallet asks for confirmation; after that it signs straight away.
     if (ackKey && localStorage.getItem(ackKey) === '1') {
       toast('Confirmation set for this wallet — signing…', { duration: 1500 });
       submit();

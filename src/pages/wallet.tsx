@@ -129,7 +129,6 @@ export function WalletPage() {
 
 interface BalanceHeroProps {
   overview: WalletOverview;
-  /** Real on-chain SOL for the connected Solana address in live mode; undefined falls back to the stub. */
   liveBalanceSol?: number;
 }
 

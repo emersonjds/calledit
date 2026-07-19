@@ -23,14 +23,9 @@ export function OnboardingPage() {
 
   const goHome = () => navigate('/', { replace: true });
 
-  // Demo mode only boots MSW at startup (main.tsx) and the session store reads the matchId once
-  // at module load — switching mode in place leaves both stale (real API 404s, wrong match).
-  // So "Try the demo" reloads into a fresh demo boot; this effect finishes that handoff by
-  // connecting as guest once the page comes back up in demo mode.
   useEffect(() => {
     const resumingDemo = new URLSearchParams(window.location.search).get('demo') === '1';
     if (!resumingDemo) {
-      // A fresh landing is always live (fetch real data); only "Try the demo" opts into the sandbox.
       setMode('live');
       return;
     }
@@ -45,7 +40,6 @@ export function OnboardingPage() {
     window.location.assign('/onboarding?demo=1');
   };
 
-  // Google here is a simulated OAuth backed by the same embedded wallet (real SDK swap is the deferred step).
   const enterWithGoogle = async () => {
     if (busy) return;
     setBusy(true);

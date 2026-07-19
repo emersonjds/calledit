@@ -18,8 +18,8 @@ export interface AddressLedger {
   bestStreak: number;
   wonCalls: number;
   totalCalls: number;
-  predictions: Prediction[]; // newest first
-  activity: WalletActivity[]; // wallet ledger, newest first
+  predictions: Prediction[];
+  activity: WalletActivity[];
 }
 
 /** Private settlement record — never returned to the client, keeps settle deterministic. */
@@ -52,9 +52,7 @@ function load(): MockState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return JSON.parse(raw) as MockState;
-  } catch {
-    // ignore malformed storage — start clean
-  }
+  } catch {}
   return { ...freshMatch(now), seq: 1, ledgers: {}, resolutions: {} };
 }
 
@@ -63,12 +61,9 @@ const state: MockState = load();
 function persist(): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // storage full / unavailable — demo keeps running from memory
-  }
+  } catch {}
 }
 
-/** Restart the fixture when it reaches full time so the home screen is always live. */
 export function getMatch(): { seed: number; elapsedSec: number } {
   const now = Date.now();
   let elapsedSec = (now - state.matchStartMs) / 1000;
@@ -117,7 +112,6 @@ export function getLedger(address: string): AddressLedger {
     state.ledgers[address] = ledger;
     persist();
   } else if (!ledger.activity) {
-    // Backfill ledgers persisted before the wallet activity field existed.
     ledger.activity = [];
     persist();
   }
@@ -173,7 +167,7 @@ export function withdraw(address: string, amountSol: number, method: string): Wi
     amountSol,
     fiatAmount: round2(amountSol * FIAT_RATE),
     method,
-    status: 'pending', // off-ramp settles to the bank shortly after
+    status: 'pending',
     ts: Date.now(),
   });
   persist();

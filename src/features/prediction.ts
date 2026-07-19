@@ -9,7 +9,6 @@ export interface CommitArgs {
   stakeSol: number;
 }
 
-/** Commit a prediction: stamps on-chain, then tracks it as the active call. */
 export function useMakePrediction() {
   const queryClient = useQueryClient();
   const address = useSession((state) => state.address);
@@ -19,7 +18,6 @@ export function useMakePrediction() {
   return useMutation({
     mutationFn: async (args: CommitArgs) => {
       if (!address) throw new Error('Connect a wallet first');
-      // Real devnet stake: Phantom prompts to sign before the prediction is committed.
       let stakeTxSig: string;
       try {
         stakeTxSig = await signStakeTransfer(address, args.stakeSol);
@@ -44,7 +42,6 @@ export function useMakePrediction() {
   });
 }
 
-/** Poll a prediction until it settles on-chain. */
 export function usePredictionStatus(id: string | null) {
   const queryClient = useQueryClient();
   return useQuery<Prediction>({

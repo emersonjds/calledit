@@ -10,7 +10,7 @@ const PERIOD_PREFIX: Record<Period, number> = {
   '2H': 3000,
   ET: 4000,
   PENS: 6000,
-  FT: 0, // total
+  FT: 0,
 };
 
 export function periodKey(period: Period, baseKey: number): number {

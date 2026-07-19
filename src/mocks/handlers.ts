@@ -8,7 +8,6 @@ import { mulberry32, seedFromString } from './prng';
 
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
-/** Stable per-provider address so a reconnect resumes the same on-chain ledger. */
 function addressFor(provider: string): string {
   const rng = mulberry32(seedFromString(`addr-${provider}`));
   let out = provider === 'guest' ? 'guest' : '';
@@ -49,7 +48,7 @@ export const handlers = [
     if (!body.market || !isMarketId(body.market) || !body.address) {
       return HttpResponse.text('Invalid prediction', { status: 400 });
     }
-    await delay(220); // feels like a signed on-chain stamp
+    await delay(220);
     const result = commit({
       matchId: body.matchId ?? 'wc26-bra-fra',
       market: body.market,
@@ -91,7 +90,7 @@ export const handlers = [
   http.post('/api/wallet/deposit', async ({ request }) => {
     const body = (await request.json()) as { address?: string; amountSol?: number };
     if (!body.address) return HttpResponse.text('address required', { status: 400 });
-    await delay(400); // on-ramp confirmation
+    await delay(400);
     return HttpResponse.json(deposit(body.address, Number(body.amountSol ?? 0)));
   }),
 

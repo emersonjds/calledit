@@ -4,7 +4,6 @@ import { api } from '@/shared/api';
 import { isDemo } from '@/shared/config';
 import { useSession } from '@/store/session';
 
-/** Live match feed — polled like an SSE stream (swap for real /scores/stream later). */
 export function useMatchFeed() {
   const matchId = useSession((state) => state.matchId);
   return useQuery<MatchSnapshot>({

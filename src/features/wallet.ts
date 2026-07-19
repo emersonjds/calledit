@@ -5,13 +5,11 @@ import { useSession } from '@/store/session';
 import { SOLANA_RPC_URL } from '@/shared/config';
 import { getSolBalance } from '@/shared/lib/solana-rpc';
 
-/** Connect a wallet provider through the adapter seam. `address` is set for app-created/embedded wallets. */
 export function useConnectWallet() {
   const connect = useSession((state) => state.connect);
   return useMutation({
     mutationFn: ({ provider, address }: { provider: string; address?: string }) =>
       api.connectWallet(provider, address),
-    // In live mode the backend echoes a stub address; if the caller supplied a real one, keep it.
     onSuccess: (account, { address }) => connect(address ? { ...account, address } : account),
   });
 }
@@ -26,7 +24,6 @@ export function useWalletOverview() {
   });
 }
 
-/** Real on-chain SOL balance for a connected Solana address. Never crashes the page — errors just leave the value undefined and the caller falls back to the stub balance. */
 export function useOnchainBalance(address: string | null, enabled: boolean) {
   return useQuery({
     queryKey: ['onchain-balance', address],
@@ -49,13 +46,11 @@ function useWalletMutation<TArgs>(mutationFn: (args: TArgs) => Promise<WalletOve
   });
 }
 
-/** On-ramp: local fiat → SOL. */
 export function useDeposit() {
   const address = useSession((state) => state.address);
   return useWalletMutation((amountSol: number) => api.deposit(address as string, amountSol));
 }
 
-/** Off-ramp: SOL → local fiat, paid out to the user's bank (e.g. PIX). */
 export function useWithdraw() {
   const address = useSession((state) => state.address);
   return useWalletMutation((args: { amountSol: number; method: string }) =>
