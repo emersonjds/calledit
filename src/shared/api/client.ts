@@ -36,6 +36,7 @@ export interface CommitPredictionInput {
   market: MarketId;
   stakeSol: number;
   address: string;
+  stakeTxSig: string;
 }
 
 export const api = {
