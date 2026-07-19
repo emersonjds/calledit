@@ -12,6 +12,8 @@ export interface WalletOption {
 interface SolanaProvider {
   isPhantom?: boolean;
   connect: () => Promise<{ publicKey: { toString: () => string } }>;
+  publicKey?: { toString(): string };
+  signAndSendTransaction?(tx: unknown): Promise<{ signature: string }>;
 }
 interface EvmProvider {
   isMetaMask?: boolean;
@@ -28,7 +30,7 @@ declare global {
 }
 
 /** Phantom injects at window.phantom.solana; some setups only expose window.solana. */
-function detectPhantom(win: Window | undefined): SolanaProvider | undefined {
+export function detectPhantom(win: Window | undefined): SolanaProvider | undefined {
   const provider = win?.phantom?.solana ?? win?.solana;
   return provider?.isPhantom ? provider : undefined;
 }
