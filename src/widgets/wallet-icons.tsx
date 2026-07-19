@@ -1,3 +1,24 @@
+import { useState } from 'react';
+
+/**
+ * Prefers an official logo dropped into `public/wallets/<id>.png`; falls back to the
+ * inline brand mark below when that file is absent — so no download step is required.
+ */
+export function WalletLogo({ id }: { id: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!failed) {
+    return (
+      <img
+        src={`/wallets/${id}.png`}
+        alt=""
+        className="size-9 shrink-0 rounded-lg"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return id === 'phantom' ? <PhantomIcon /> : <MetaMaskIcon />;
+}
+
 /** Self-contained brand marks so the wallet list needs no image assets or extra dependency. */
 
 export function PhantomIcon() {
