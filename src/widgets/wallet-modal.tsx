@@ -104,9 +104,10 @@ export function WalletModal({
             }}
             className={ROW}
           >
-            <img src="/solana.png" alt="Solana" className="size-9 shrink-0 rounded-lg" />
+            <span className="flex size-9 shrink-0 items-center justify-center">
+              <img src="/solana.png" alt="Solana" className="size-6" />
+            </span>
             <span className="text-foreground flex-1 font-semibold">Create a new wallet</span>
-            <span className="text-muted-foreground text-xs">No install needed</span>
           </button>
 
           <p className="text-muted-foreground pt-1 text-center text-[11px]">
