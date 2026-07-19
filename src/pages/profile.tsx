@@ -6,9 +6,10 @@ import { DataNote } from '@/shared/ui/data-note';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Switch } from '@/shared/ui/switch';
 import { Button } from '@/shared/ui/button';
-import { shortAddress } from '@/shared/lib/format';
-import { getMode } from '@/shared/config';
+import { formatSol, shortAddress } from '@/shared/lib/format';
+import { getMode, isDemo } from '@/shared/config';
 import { useProfile, useHistory } from '@/features/profile';
+import { useOnchainBalance } from '@/features/wallet';
 import { useSession } from '@/store/session';
 import { CallRow } from './history';
 
@@ -16,10 +17,18 @@ export function ProfilePage() {
   const profile = useProfile();
   const history = useHistory();
   const address = useSession((state) => state.address);
+  const chain = useSession((state) => state.chain);
   const disconnect = useSession((state) => state.disconnect);
   const me = profile.data;
   const demo = getMode() === 'demo';
   const recent = (history.data ?? []).slice(0, 3);
+
+  const showOnchainBalance = chain === 'solana' && !isDemo();
+  const onchainBalance = useOnchainBalance(address, showOnchainBalance);
+  const walletBalanceLabel =
+    chain === 'evm'
+      ? 'EVM address — no SOL balance'
+      : formatSol(onchainBalance.data ?? me?.balanceSol ?? 0);
 
   const copyAddress = async () => {
     if (!address) return;
@@ -59,7 +68,7 @@ export function ProfilePage() {
             <p className="text-foreground font-mono text-sm">
               {address ? shortAddress(address) : '—'}
             </p>
-            <p className="text-muted-foreground text-xs">{me?.balanceSol ?? 0} SOL</p>
+            <p className="text-muted-foreground text-xs">{walletBalanceLabel}</p>
           </div>
           <Button
             size="icon"

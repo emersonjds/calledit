@@ -2,8 +2,17 @@ export type AppMode = 'live' | 'demo';
 
 const MODE_KEY = 'called-it:mode';
 
-export const API_BASE_URL: string =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api';
+// No VITE_API_BASE_URL set → the real backend isn't wired yet, so MSW serves '/api' on this origin.
+export const hasRealBackend: boolean = Boolean(import.meta.env.VITE_API_BASE_URL);
+export const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api';
+
+// Devnet by default to match the app's settlement cluster. Override via VITE_SOLANA_RPC_URL
+// (e.g. mainnet-beta) — never hardcode mainnet here.
+export const SOLANA_RPC_URL: string =
+  import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
+
+// The real TxLINE fixture the live match tracks by default (Spain vs Argentina). Override per event.
+export const LIVE_MATCH_ID: string = import.meta.env.VITE_LIVE_MATCH_ID ?? '18257739';
 
 // Pure so it is unit-testable; the two args are the only inputs.
 export function resolveMode(persisted: string | null, forceDemoEnv: string | undefined): AppMode {

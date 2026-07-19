@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { MarketId } from '@/entities/prediction';
 import type { ChainKind, WalletAccount } from '@/entities/wallet';
 import { DEMO_MATCH_ID } from '@/mocks/config';
+import { LIVE_MATCH_ID, isDemo } from '@/shared/config';
 
 interface SessionState {
   address: string | null;
@@ -15,6 +16,7 @@ interface SessionState {
   disconnect: () => void;
   selectMarket: (market: MarketId | null) => void;
   setActivePrediction: (id: string | null) => void;
+  selectMatch: (id: string) => void;
 }
 
 export const useSession = create<SessionState>()(
@@ -23,7 +25,7 @@ export const useSession = create<SessionState>()(
       address: null,
       provider: null,
       chain: null,
-      matchId: DEMO_MATCH_ID,
+      matchId: isDemo() ? DEMO_MATCH_ID : LIVE_MATCH_ID,
       selectedMarket: null,
       activePredictionId: null,
       connect: (account) =>
@@ -36,6 +38,7 @@ export const useSession = create<SessionState>()(
         set({ address: null, provider: null, chain: null, activePredictionId: null }),
       selectMarket: (market) => set({ selectedMarket: market }),
       setActivePrediction: (id) => set({ activePredictionId: id }),
+      selectMatch: (id) => set({ matchId: id }),
     }),
     {
       name: 'called-it:session',

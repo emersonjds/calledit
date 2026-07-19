@@ -24,8 +24,10 @@ import {
 } from '@/shared/ui/sheet';
 import { cn } from '@/shared/lib/utils';
 import { formatFiat, formatSol, formatTimeOfDay } from '@/shared/lib/format';
-import { useDeposit, useWalletOverview, useWithdraw } from '@/features/wallet';
+import { useDeposit, useOnchainBalance, useWalletOverview, useWithdraw } from '@/features/wallet';
 import type { ActivityType, WalletActivity, WalletOverview } from '@/entities/wallet';
+import { useSession } from '@/store/session';
+import { isDemo } from '@/shared/config';
 
 type SheetMode = 'cash-out' | 'add-funds' | null;
 type PayoutMethod = 'PIX' | 'Bank transfer';
@@ -43,9 +45,19 @@ export function WalletPage() {
   const [sheetMode, setSheetMode] = useState<SheetMode>(null);
   const overview = wallet.data;
 
+  const chain = useSession((state) => state.chain);
+  const address = useSession((state) => state.address);
+  const showOnchainBalance = chain === 'solana' && !isDemo();
+  const onchainBalance = useOnchainBalance(address, showOnchainBalance);
+  const liveBalanceSol = showOnchainBalance ? onchainBalance.data : undefined;
+
   return (
     <div className="space-y-4 px-4 py-4">
-      <DataNote>Balance and activity are placeholder backend values in live mode.</DataNote>
+      <DataNote>
+        {liveBalanceSol !== undefined
+          ? 'Balance is your real on-chain SOL. Activity is a placeholder backend value in live mode.'
+          : 'Balance and activity are placeholder backend values in live mode.'}
+      </DataNote>
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -67,7 +79,7 @@ export function WalletPage() {
         </div>
       ) : (
         <>
-          <BalanceHero overview={overview} />
+          <BalanceHero overview={overview} liveBalanceSol={liveBalanceSol} />
 
           <div className="grid grid-cols-2 gap-3">
             <Button
@@ -117,17 +129,20 @@ export function WalletPage() {
 
 interface BalanceHeroProps {
   overview: WalletOverview;
+  /** Real on-chain SOL for the connected Solana address in live mode; undefined falls back to the stub. */
+  liveBalanceSol?: number;
 }
 
-function BalanceHero({ overview }: BalanceHeroProps) {
+function BalanceHero({ overview, liveBalanceSol }: BalanceHeroProps) {
+  const balanceSol = liveBalanceSol ?? overview.balanceSol;
   return (
     <div className="border-lime/40 bg-card glow-lime rounded-2xl border px-5 py-6 text-center">
-      <p className="text-muted-foreground text-[11px] tracking-widest">TOTAL BALANCE</p>
-      <p className="text-lime mt-1 font-mono text-4xl font-bold">
-        {formatSol(overview.balanceSol)}
+      <p className="text-muted-foreground text-[11px] tracking-widest">
+        {liveBalanceSol !== undefined ? 'ON-CHAIN BALANCE' : 'TOTAL BALANCE'}
       </p>
+      <p className="text-lime mt-1 font-mono text-4xl font-bold">{formatSol(balanceSol)}</p>
       <p className="text-muted-foreground mt-1 text-sm">
-        ≈ {formatFiat(overview.balanceSol * overview.fiatRate, overview.currency)}
+        ≈ {formatFiat(balanceSol * overview.fiatRate, overview.currency)}
       </p>
       <p className="text-muted-foreground mt-3 font-mono text-[11px]">
         1 SOL ≈ {formatFiat(overview.fiatRate, overview.currency)}

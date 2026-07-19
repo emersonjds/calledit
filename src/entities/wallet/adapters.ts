@@ -10,17 +10,35 @@ export interface WalletOption {
 }
 
 interface SolanaProvider {
+  isPhantom?: boolean;
   connect: () => Promise<{ publicKey: { toString: () => string } }>;
 }
 interface EvmProvider {
+  isMetaMask?: boolean;
+  providers?: EvmProvider[];
   request: (args: { method: string }) => Promise<string[]>;
 }
 
 declare global {
   interface Window {
     phantom?: { solana?: SolanaProvider };
+    solana?: SolanaProvider;
     ethereum?: EvmProvider;
   }
+}
+
+/** Phantom injects at window.phantom.solana; some setups only expose window.solana. */
+function detectPhantom(win: Window | undefined): SolanaProvider | undefined {
+  const provider = win?.phantom?.solana ?? win?.solana;
+  return provider?.isPhantom ? provider : undefined;
+}
+
+/** Multi-wallet browsers (Phantom, Coinbase...) inject an array on window.ethereum.providers. */
+function detectMetaMask(win: Window | undefined): EvmProvider | undefined {
+  const ethereum = win?.ethereum;
+  const fromArray = ethereum?.providers?.find((candidate) => candidate.isMetaMask);
+  if (fromArray) return fromArray;
+  return ethereum?.isMetaMask ? ethereum : undefined;
 }
 
 function solanaConnect(provider: SolanaProvider): () => Promise<string> {
@@ -36,8 +54,8 @@ function evmConnect(provider: EvmProvider): () => Promise<string> {
 /** Reads injected wallet globals; pure w.r.t. the current window so it stays testable. */
 export function detectWallets(): WalletOption[] {
   const win: Window | undefined = typeof window !== 'undefined' ? window : undefined;
-  const phantom = win?.phantom?.solana;
-  const ethereum = win?.ethereum;
+  const phantom = detectPhantom(win);
+  const metamask = detectMetaMask(win);
   return [
     {
       id: 'phantom',
@@ -52,8 +70,8 @@ export function detectWallets(): WalletOption[] {
       label: 'MetaMask',
       chain: 'evm',
       installLink: 'https://metamask.io',
-      installed: Boolean(ethereum),
-      connect: ethereum ? evmConnect(ethereum) : undefined,
+      installed: Boolean(metamask),
+      connect: metamask ? evmConnect(metamask) : undefined,
     },
   ];
 }
