@@ -1,6 +1,6 @@
 <div align="center">
 
-# CALLED⚡T
+# CALLED ⚡T
 
 **Call it before it happens — and let Solana prove you called it first.**
 
