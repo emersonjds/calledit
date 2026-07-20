@@ -61,7 +61,10 @@ export const handlers = [
 
   http.get('/api/predictions', ({ request }) => {
     const address = new URL(request.url).searchParams.get('address') ?? '';
-    return HttpResponse.json({ items: getLedger(address).predictions });
+    // Settle any prediction past its window — the overlay poll only covers open ones,
+    // so minimized/abandoned calls would otherwise stay "live" forever.
+    const items = getLedger(address).predictions.map((entry) => getPrediction(entry.id) ?? entry);
+    return HttpResponse.json({ items });
   }),
 
   http.get('/api/predictions/:id', ({ params }) => {
