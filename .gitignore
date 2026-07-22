@@ -18,6 +18,7 @@ node_modules/.tmp/
 coverage/
 playwright-report/
 test-results/
+media/
 
 # AI tooling — never commit local/session state
 .claude/settings.local.json

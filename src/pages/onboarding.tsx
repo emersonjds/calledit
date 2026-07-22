@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Link2, Zap } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
@@ -23,7 +23,12 @@ export function OnboardingPage() {
 
   const goHome = () => navigate('/', { replace: true });
 
+  // Run once. StrictMode replays this effect after replaceState has stripped ?demo=1,
+  // so re-reading window.location on the replay would misfire setMode('live').
+  const entered = useRef(false);
   useEffect(() => {
+    if (entered.current) return;
+    entered.current = true;
     const resumingDemo = new URLSearchParams(window.location.search).get('demo') === '1';
     if (!resumingDemo) {
       setMode('live');
