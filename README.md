@@ -10,6 +10,13 @@ A live, on-chain-verified match-prediction PWA for the FIFA World Cup 2026. Stak
 [![Vite](https://img.shields.io/badge/Vite-build-FF7A18?labelColor=0B0F14)](https://vitejs.dev)
 [![React 19](https://img.shields.io/badge/React-19-B6FF3C?labelColor=0B0F14)](https://react.dev)
 [![PWA](https://img.shields.io/badge/PWA-mobile--first-FF7A18?labelColor=0B0F14)](https://web.dev/progressive-web-apps/)
+[![E2E](https://img.shields.io/badge/E2E-Playwright-B6FF3C?labelColor=0B0F14)](e2e/README.md)
+
+<br />
+
+<img src=".github/demo.gif" alt="Called It demo — onboarding, live match, one-tap on-chain call, and every screen" width="300" />
+
+_Onboarding → live match → one-tap call stamped on-chain → history, leaderboard, profile, wallet — captured end-to-end by [Playwright](e2e/README.md)._
 
 </div>
 
@@ -81,6 +88,10 @@ pnpm install
 pnpm dev          # http://localhost:5173 — demo if no env; live with .env.local
 pnpm build        # production build
 pnpm test         # vitest
+pnpm e2e          # Playwright — captures PNG evidence to media/screens/
+pnpm e2e:video    # stitch the PNGs into .github/demo.gif (needs ffmpeg)
 ```
+
+E2E flow and evidence layout: [`e2e/README.md`](e2e/README.md).
 
 Live at **https://called-it.netlify.app** — deployed on Netlify from `master`.
