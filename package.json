@@ -14,6 +14,8 @@
     "format:check": "prettier --check .",
     "type-check": "tsc -b",
     "test": "vitest run",
+    "e2e": "playwright test",
+    "e2e:video": "node e2e/build-video.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -54,6 +56,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/react-query-devtools": "^5.101.2",
     "@types/node": "^24.7.0",
