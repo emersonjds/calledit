@@ -16,7 +16,7 @@ A live, on-chain-verified match-prediction PWA for the FIFA World Cup 2026. Stak
 
 <img src=".github/demo.gif" alt="Called It demo — onboarding, live match, one-tap on-chain call, and every screen" width="300" />
 
-_Onboarding → live match → one-tap call stamped on-chain → history, leaderboard, profile, wallet — captured end-to-end by [Playwright](e2e/README.md)._
+<br />
 
 </div>
 
